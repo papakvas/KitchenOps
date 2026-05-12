@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0e0c0a"/>
+<title>KitchenOPS Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+
+<!-- ════════════════════════════════════════════════════════════════════
+  KitchenOPS Cloud — Phase 2B (Login + Auth Shell)
+  
+  ⚠️ CONFIG REQUIRED — fill in the two values below before running.
+  Get them from: Supabase Dashboard → Settings → API
+  
+  - SUPABASE_URL is the project URL (https://xxx.supabase.co)
+  - SUPABASE_ANON_KEY is the "anon public" key (safe to put in client code)
+  
+  Do NOT put your service_role key here. That stays in the admin panel only.
+═══════════════════════════════════════════════════════════════════════ -->
+
+<style>
+:root{
+  --black:#0e0c0a;
+  --dark:#161310;
+  --panel:#1e1a16;
+  --panel2:#252017;
+  --border:#312b22;
+  --border2:#423a2c;
+  --amber:#e8a045;
+  --amber2:#f0b865;
+  --amber-dim:rgba(232,160,69,0.12);
+  --cream:#f0e8d8;
+  --cream2:#c8bfb0;
+  --muted:#7a6f62;
+  --muted2:#504840;
+  --red:#e05c4a;
+  --red-dim:rgba(224,92,74,0.12);
+  --green:#6aab78;
+  --green-dim:rgba(106,171,120,0.12);
+  --blue:#5b8dee;
+  --blue-dim:rgba(91,141,238,0.12);
+  --on-amber:#1a1108;
+  --r:5px;--rm:8px;
+  --hd:'Bebas Neue',sans-serif;
+  --cond:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--black);color:var(--cream);font-family:var(--body);min-height:100dvh;overscroll-behavior:none}
+body{display:flex;flex-direction:column}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+input[type="email"],input[type="password"],input[type="text"]{
+  -webkit-appearance:none;appearance:none;
+  background:var(--panel);border:1.5px solid var(--border2);
+  color:var(--cream);padding:13px 14px;border-radius:var(--rm);
+  font-size:15px;width:100%;outline:none;transition:border-color .14s;
+}
+input[type="email"]:focus,input[type="password"]:focus,input[type="text"]:focus{
+  border-color:var(--amber);
+}
+input::placeholder{color:var(--muted)}
+
+/* ── HEADER ── */
+.hdr{position:sticky;top:0;background:linear-gradient(180deg,var(--black) 0%,var(--black) 70%,rgba(14,12,10,.85) 100%);padding:14px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--border);z-index:10;backdrop-filter:blur(6px)}
+.logo{font-family:var(--hd);font-size:24px;letter-spacing:1.5px;color:var(--cream);flex:1}
+.logo b{color:var(--amber);font-weight:400}
+.htag{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:5px 9px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--panel)}
+
+/* ── MAIN AUTH CONTAINER ── */
+.auth-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:stretch;padding:20px 18px;max-width:440px;margin:0 auto;width:100%}
+.brand{text-align:center;margin-bottom:28px}
+.brand-mark{font-family:var(--hd);font-size:54px;letter-spacing:2px;line-height:1;margin-bottom:6px}
+.brand-mark b{color:var(--amber);font-weight:400}
+.brand-sub{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+
+.auth-card{background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:22px 18px;margin-bottom:14px}
+.auth-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1.5px solid var(--border);background:transparent}
+.auth-tab{flex:1;padding:11px 8px;font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);background:transparent;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:all .14s}
+.auth-tab.on{color:var(--amber);border-bottom-color:var(--amber)}
+
+.fg{margin-bottom:12px}
+.fl{display:block;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+
+.btn{padding:13px 20px;border-radius:var(--rm);border:1.5px solid;font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .14s;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{transform:scale(.98)}
+.btn-amber{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
+.btn-amber:hover{background:var(--amber2);border-color:var(--amber2)}
+.btn-ghost{background:transparent;color:var(--cream2);border-color:var(--border2)}
+.btn-ghost:hover{background:var(--panel2);color:var(--cream)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+.alt-action{text-align:center;margin-top:14px;font-family:var(--cond);font-size:12px;color:var(--muted2);letter-spacing:.5px}
+.alt-action a{color:var(--amber);text-decoration:none;cursor:pointer;font-weight:600}
+.alt-action a:hover{color:var(--amber2);text-decoration:underline}
+
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
+.divider::before,.divider::after{content:'';flex:1;height:1.5px;background:var(--border)}
+
+.disabled-method{opacity:.5;cursor:not-allowed;position:relative}
+.disabled-method::after{content:attr(data-hint);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--dark);border:1.5px solid var(--border2);border-radius:var(--r);padding:6px 10px;font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:none;color:var(--cream2);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .14s}
+.disabled-method:hover::after{opacity:1}
+
+/* ── MESSAGES ── */
+.msg{margin-top:12px;padding:10px 12px;border-radius:var(--rm);font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:.5px;line-height:1.4;display:flex;align-items:flex-start;gap:8px}
+.msg-err{background:var(--red-dim);border:1.5px solid rgba(224,92,74,.4);color:var(--red)}
+.msg-ok{background:var(--green-dim);border:1.5px solid rgba(106,171,120,.4);color:var(--green)}
+.msg-info{background:var(--blue-dim);border:1.5px solid rgba(91,141,238,.4);color:var(--blue)}
+
+/* ── LOADING SPINNER ── */
+.spinner{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── DASHBOARD (post-login placeholder) ── */
+.dash{flex:1;padding:18px;max-width:640px;margin:0 auto;width:100%}
+.greeting{font-family:var(--hd);font-size:44px;letter-spacing:1.5px;line-height:1;margin-bottom:6px;color:var(--cream)}
+.greeting-sub{font-family:var(--cond);font-size:13px;font-weight:600;letter-spacing:1px;color:var(--muted);margin-bottom:18px}
+.greeting-sub b{color:var(--amber);font-weight:700}
+
+.trial-banner{background:var(--amber-dim);border:1.5px solid rgba(232,160,69,.4);border-radius:var(--rm);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.trial-banner.warn{background:var(--red-dim);border-color:rgba(224,92,74,.4)}
+.trial-icon{font-size:20px;line-height:1}
+.trial-body{flex:1;font-family:var(--cond);font-size:12px;line-height:1.4;color:var(--cream)}
+.trial-body b{color:var(--amber);font-weight:700}
+.trial-banner.warn .trial-body b{color:var(--red)}
+
+.info-card{background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:16px;margin-bottom:14px}
+.info-card-title{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+.info-card-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-family:var(--cond);font-size:13px}
+.info-card-row:last-child{border-bottom:none}
+.info-card-row .lbl{color:var(--muted)}
+.info-card-row .val{color:var(--cream);font-weight:600}
+.info-card-row .val.amber{color:var(--amber)}
+.info-card-row .val.green{color:var(--green)}
+
+.dash-footer{margin-top:24px;padding:18px;text-align:center;font-family:var(--cond);font-size:11px;color:var(--muted2);letter-spacing:.5px;line-height:1.5}
+
+/* ── INITIAL LOADING SCREEN ── */
+.boot-screen{position:fixed;inset:0;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:1000}
+.boot-screen .spinner{width:28px;height:28px;color:var(--amber)}
+.boot-screen p{font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+/* ── CONFIG ERROR SCREEN ── */
+.config-err{position:fixed;inset:0;background:var(--black);display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999}
+.config-err-card{max-width:480px;background:var(--panel);border:1.5px solid var(--red);border-radius:var(--rm);padding:24px;text-align:left}
+.config-err-card h1{font-family:var(--hd);font-size:32px;letter-spacing:1.5px;color:var(--red);margin:0 0 10px}
+.config-err-card p{font-family:var(--body);font-size:14px;line-height:1.5;margin:0 0 12px}
+.config-err-card code{display:block;background:var(--dark);border:1.5px solid var(--border);padding:8px 10px;border-radius:var(--r);font-family:monospace;font-size:12px;color:var(--amber);margin:6px 0;overflow-x:auto;white-space:nowrap}
+
+/* ── SR-ONLY ── */
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ── HIDDEN UTIL ── */
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<!-- ──────────────────── BOOT SCREEN ──────────────────── -->
+<div class="boot-screen" id="boot">
+  <div class="spinner"></div>
+  <p>Φόρτωση...</p>
+</div>
+
+<!-- ──────────────────── CONFIG ERROR SCREEN ──────────────────── -->
+<div class="config-err hidden" id="config-err">
+  <div class="config-err-card">
+    <h1>⚠️ CONFIG MISSING</h1>
+    <p>Πριν χρησιμοποιήσεις την εφαρμογή, πρέπει να συμπληρώσεις τα δικά σου Supabase credentials στην αρχή του αρχείου HTML.</p>
+    <p>Άνοιξε το αρχείο με έναν text editor και βρες αυτές τις γραμμές:</p>
+    <code>const SUPABASE_URL = '...';</code>
+    <code>const SUPABASE_ANON_KEY = '...';</code>
+    <p>Αντικατάστησε τις τιμές με αυτές από το Supabase Dashboard → Settings → API.</p>
+  </div>
+</div>
+
+<!-- ──────────────────── LOGIN VIEW ──────────────────── -->
+<div class="hidden" id="view-auth">
+  <header class="hdr">
+    <div class="logo">Kitchen<b>OPS</b></div>
+    <div class="htag">CLOUD</div>
+  </header>
+  <main class="auth-wrap">
+    <div class="brand">
+      <div class="brand-mark">Kitchen<b>OPS</b></div>
+      <div class="brand-sub">Διαχείριση Εστιατορίου</div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab on" id="tab-signin" data-tab="signin" role="tab">Σύνδεση</button>
+        <button class="auth-tab" id="tab-signup" data-tab="signup" role="tab">Εγγραφή</button>
+      </div>
+
+      <!-- SIGN IN PANEL -->
+      <div id="panel-signin">
+        <div class="fg">
+          <label class="fl" for="si-email">Email</label>
+          <input type="email" id="si-email" autocomplete="email" placeholder="you@example.com" inputmode="email"/>
+        </div>
+        <div class="fg">
+          <label class="fl" for="si-password">Κωδικός</label>
+          <input type="password" id="si-password" autocomplete="current-password" placeholder="••••••••"/>
+        </div>
+        <button class="btn btn-amber" id="btn-signin" type="button">Σύνδεση</button>
+
+        <div class="divider">ή</div>
+
+        <button class="btn btn-ghost disabled-method" id="btn-magic" type="button"
+                data-hint="Διαθέσιμο όταν η εφαρμογή είναι online">
+          ✉️ Magic Link (link μέσω email)
+        </button>
+
+        <div id="msg-signin"></div>
+      </div>
+
+      <!-- SIGN UP PANEL -->
+      <div class="hidden" id="panel-signup">
+        <div class="fg">
+          <label class="fl" for="su-restaurant">Όνομα Εστιατορίου</label>
+          <input type="text" id="su-restaurant" placeholder="π.χ. Ταβέρνα Ο Γιάννης" autocomplete="off"/>
+        </div>
+        <div class="fg">
+          <label class="fl" for="su-email">Email</label>
+          <input type="email" id="su-email" autocomplete="email" placeholder="you@example.com" inputmode="email"/>
+        </div>
+        <div class="fg">
+          <label class="fl" for="su-password">Κωδικός (τουλάχιστον 6 χαρακτήρες)</label>
+          <input type="password" id="su-password" autocomplete="new-password" placeholder="••••••••"/>
+        </div>
+        <button class="btn btn-amber" id="btn-signup" type="button">Δημιουργία Λογαριασμού</button>
+
+        <div id="msg-signup"></div>
+
+        <div class="alt-action">
+          Δωρεάν δοκιμή 14 ημερών · Χωρίς κάρτα
+        </div>
+      </div>
+    </div>
+
+    <div class="alt-action" style="margin-top:18px">
+      Με τη χρήση, αποδέχεσαι τους <a id="lnk-tos">όρους χρήσης</a>.
+    </div>
+  </main>
+</div>
+
+<!-- ──────────────────── DASHBOARD VIEW (post-login) ──────────────────── -->
+<div class="hidden" id="view-dash">
+  <header class="hdr">
+    <div class="logo">Kitchen<b>OPS</b></div>
+    <div class="htag" id="htag-status">CONNECTED</div>
+  </header>
+  <main class="dash">
+    <div class="greeting" id="greeting">Καλώς ήρθες</div>
+    <div class="greeting-sub" id="greeting-sub"></div>
+
+    <div id="trial-banner-slot"></div>
+
+    <div class="info-card">
+      <div class="info-card-title">Στοιχεία Λογαριασμού</div>
+      <div class="info-card-row"><span class="lbl">Email</span><span class="val" id="i-email">—</span></div>
+      <div class="info-card-row"><span class="lbl">Εστιατόριο</span><span class="val" id="i-rest">—</span></div>
+      <div class="info-card-row"><span class="lbl">Ρόλος</span><span class="val amber" id="i-role">—</span></div>
+      <div class="info-card-row"><span class="lbl">Πλάνο</span><span class="val" id="i-plan">—</span></div>
+      <div class="info-card-row"><span class="lbl">Συνδρομή</span><span class="val" id="i-sub">—</span></div>
+    </div>
+
+    <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
+      <div class="info-card-title" style="color:var(--amber)">🚧 Phase 2B — Auth Shell</div>
+      <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
+        Σε αυτή τη φάση δοκιμάζουμε μόνο τη σύνδεση και τη δημιουργία λογαριασμού.
+        Το πλήρες app (Βάρδια, Αποθήκη, Παραγγελίες, Πρόγραμμα) έρχεται στη Phase 2C.
+        Αν βλέπεις τα στοιχεία σου παραπάνω, η σύνδεση δουλεύει σωστά.
+      </p>
+    </div>
+
+    <button class="btn btn-ghost" id="btn-logout" style="margin-top:18px">Αποσύνδεση</button>
+
+    <div class="dash-footer">
+      KitchenOPS Cloud · v0 (Phase 2B)<br/>
+      Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
+    </div>
+  </main>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SUPABASE CLIENT (from CDN — no build step needed)
+───────────────────────────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+// ⚠️ FILL IN YOUR SUPABASE PROJECT CREDENTIALS HERE
+// Get them from: Supabase Dashboard → Settings → API
+// ════════════════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ybpvjnkmubowqukjtjgh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicHZqbmttdWJvd3F1a2p0amdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDM2MjMsImV4cCI6MjA5NDA3OTYyM30.ZMeBlokB5k6Eg4g-NwvlVGKsjX0w6lvXf0ErFT9fQq0';
+// ════════════════════════════════════════════════════════════════════════
+
+// Set to true once you deploy to a real URL (Netlify etc.) — enables magic link
+const IS_HOSTED = false;
+
+// ─── CONFIG CHECK ────────────────────────────────────────────────────────
+(function checkConfig(){
+  if(!SUPABASE_URL || SUPABASE_URL.includes('PASTE_YOUR') ||
+     !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('PASTE_YOUR')){
+    document.getElementById('boot').classList.add('hidden');
+    document.getElementById('config-err').classList.remove('hidden');
+    throw new Error('Supabase config missing — edit the HTML file');
+  }
+})();
+
+// ─── SUPABASE CLIENT ─────────────────────────────────────────────────────
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true, // handles magic link redirects
+    storage: window.localStorage,
+  },
+});
+
+// ─── DOM HELPERS ─────────────────────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const show = (id) => $(id).classList.remove('hidden');
+const hide = (id) => $(id).classList.add('hidden');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+
+function msg(el, type, text){
+  if(!text){ el.innerHTML = ''; return; }
+  const icon = type === 'err' ? '⚠️' : (type === 'ok' ? '✓' : 'ℹ');
+  el.innerHTML = `<div class="msg msg-${type}"><span>${icon}</span><span>${esc(text)}</span></div>`;
+}
+
+function setLoading(btn, loading, originalText){
+  if(loading){
+    btn.dataset.origText = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Παρακαλώ περιμένετε...`;
+  } else {
+    btn.disabled = false;
+    btn.textContent = btn.dataset.origText || originalText || btn.textContent;
+  }
+}
+
+// Greek translations of common Supabase error codes
+function friendlyError(err){
+  const m = (err && err.message) || String(err || '');
+  if (/Invalid login credentials/i.test(m)) return 'Λάθος email ή κωδικός.';
+  if (/Email not confirmed/i.test(m)) return 'Το email δεν έχει επιβεβαιωθεί ακόμα.';
+  if (/User already registered/i.test(m)) return 'Αυτό το email χρησιμοποιείται ήδη. Δοκίμασε σύνδεση.';
+  if (/Password should be at least/i.test(m)) return 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.';
+  if (/Unable to validate email/i.test(m)) return 'Μη έγκυρο email.';
+  if (/rate limit/i.test(m)) return 'Πάρα πολλές προσπάθειες. Περίμενε λίγο.';
+  if (/network|fetch|Failed to fetch/i.test(m)) return 'Πρόβλημα σύνδεσης. Έλεγξε το internet.';
+  return m || 'Άγνωστο σφάλμα.';
+}
+
+// ─── TAB SWITCHING ───────────────────────────────────────────────────────
+document.querySelectorAll('.auth-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.tab;
+    document.querySelectorAll('.auth-tab').forEach(b => b.classList.toggle('on', b === btn));
+    if(t === 'signin'){ show('panel-signin'); hide('panel-signup'); }
+    else { hide('panel-signin'); show('panel-signup'); }
+    // Clear any leftover error messages when switching tabs
+    msg($('msg-signin'), 'err', '');
+    msg($('msg-signup'), 'err', '');
+  });
+});
+
+// ─── SIGN UP ─────────────────────────────────────────────────────────────
+$('btn-signup').addEventListener('click', async () => {
+  const email = $('su-email').value.trim();
+  const password = $('su-password').value;
+  const restaurantName = $('su-restaurant').value.trim();
+  const btn = $('btn-signup');
+  const msgEl = $('msg-signup');
+
+  if(!email){ msg(msgEl, 'err', 'Συμπλήρωσε email.'); $('su-email').focus(); return; }
+  if(!password || password.length < 6){ msg(msgEl, 'err', 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.'); $('su-password').focus(); return; }
+  if(!restaurantName){ msg(msgEl, 'err', 'Συμπλήρωσε όνομα εστιατορίου.'); $('su-restaurant').focus(); return; }
+
+  msg(msgEl, 'info', '');
+  setLoading(btn, true);
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { restaurant_name: restaurantName }, // passed to handle_new_user trigger
+      },
+    });
+    if(error) throw error;
+
+    if(data?.session){
+      // Auto-confirm is ON in dev — user is already logged in
+      msg(msgEl, 'ok', '✓ Λογαριασμός δημιουργήθηκε! Φόρτωση...');
+      setTimeout(() => loadDashboard(), 600);
+    } else {
+      // Email confirmation required
+      msg(msgEl, 'ok', 'Έλεγξε το email σου για να επιβεβαιώσεις τον λογαριασμό.');
+      setLoading(btn, false);
+    }
+  } catch(err){
+    msg(msgEl, 'err', friendlyError(err));
+    setLoading(btn, false);
+  }
+});
+
+// ─── SIGN IN ─────────────────────────────────────────────────────────────
+$('btn-signin').addEventListener('click', async () => {
+  const email = $('si-email').value.trim();
+  const password = $('si-password').value;
+  const btn = $('btn-signin');
+  const msgEl = $('msg-signin');
+
+  if(!email){ msg(msgEl, 'err', 'Συμπλήρωσε email.'); $('si-email').focus(); return; }
+  if(!password){ msg(msgEl, 'err', 'Συμπλήρωσε κωδικό.'); $('si-password').focus(); return; }
+
+  msg(msgEl, 'info', '');
+  setLoading(btn, true);
+
+  try {
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    msg(msgEl, 'ok', '✓ Επιτυχής σύνδεση. Φόρτωση...');
+    setTimeout(() => loadDashboard(), 400);
+  } catch(err){
+    msg(msgEl, 'err', friendlyError(err));
+    setLoading(btn, false);
+  }
+});
+
+// ─── MAGIC LINK (disabled in local file:// mode) ─────────────────────────
+$('btn-magic').addEventListener('click', async () => {
+  if(!IS_HOSTED){
+    msg($('msg-signin'), 'info', 'Το magic link χρειάζεται deployment (Netlify). Χρησιμοποίησε email + κωδικό προς το παρόν.');
+    return;
+  }
+  const email = $('si-email').value.trim();
+  const msgEl = $('msg-signin');
+  if(!email){ msg(msgEl, 'err', 'Συμπλήρωσε email πρώτα.'); $('si-email').focus(); return; }
+  setLoading($('btn-magic'), true);
+  try {
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname },
+    });
+    if(error) throw error;
+    msg(msgEl, 'ok', 'Έστειλα link στο email σου. Άνοιξέ το για να συνδεθείς.');
+  } catch(err){
+    msg(msgEl, 'err', friendlyError(err));
+  } finally {
+    setLoading($('btn-magic'), false);
+  }
+});
+
+// ─── LOGOUT ──────────────────────────────────────────────────────────────
+$('btn-logout').addEventListener('click', async () => {
+  setLoading($('btn-logout'), true);
+  try {
+    await sb.auth.signOut();
+    // Clear local state and show auth screen
+    hide('view-dash');
+    show('view-auth');
+    $('si-email').value = '';
+    $('si-password').value = '';
+  } catch(err){
+    alert('Σφάλμα: ' + friendlyError(err));
+  } finally {
+    setLoading($('btn-logout'), false);
+  }
+});
+
+// ─── LOAD DASHBOARD (post-login state) ───────────────────────────────────
+async function loadDashboard(){
+  hide('view-auth');
+  hide('boot');
+  show('view-dash');
+
+  // Show "loading" placeholders while we fetch
+  $('greeting').textContent = 'Φόρτωση...';
+  $('i-email').textContent = '…';
+  $('i-rest').textContent = '…';
+  $('i-role').textContent = '…';
+  $('i-plan').textContent = '…';
+  $('i-sub').textContent = '…';
+  $('footer-url').textContent = SUPABASE_URL.replace(/^https?:\/\//, '');
+
+  try {
+    // 1. Get current user
+    const { data: { user }, error: userErr } = await sb.auth.getUser();
+    if(userErr || !user) throw userErr || new Error('Δεν βρέθηκε χρήστης.');
+
+    // 2. Get their restaurant + role via membership join
+    const { data: rows, error: mErr } = await sb
+      .from('memberships')
+      .select(`
+        role,
+        restaurants ( id, name, plan, trial_ends_at, features )
+      `)
+      .eq('user_id', user.id)
+      .limit(1);
+    if(mErr) throw mErr;
+    if(!rows || rows.length === 0){
+      // User exists but no restaurant — trigger didn't fire (shouldn't happen, but safe)
+      throw new Error('Δεν βρέθηκε εστιατόριο για τον χρήστη. Επικοινώνησε με υποστήριξη.');
+    }
+
+    const m = rows[0];
+    const r = m.restaurants;
+    const trialEnd = new Date(r.trial_ends_at);
+    const now = new Date();
+    const daysLeft = Math.ceil((trialEnd - now) / 86400000);
+
+    // 3. Check subscription (RLS will filter to just this restaurant's row, if any)
+    const { data: subs } = await sb
+      .from('subscriptions')
+      .select('source, is_active, current_period_end, manual_paid_until')
+      .eq('restaurant_id', r.id)
+      .eq('is_active', true)
+      .limit(1);
+
+    const hasActiveSub = subs && subs.length > 0;
+    const sub = hasActiveSub ? subs[0] : null;
+
+    // ── Populate UI ──
+    const firstName = (user.user_metadata?.full_name || user.email.split('@')[0]).split(/[\s.@]/)[0];
+    $('greeting').textContent = `Γεια σου, ${firstName}`;
+    $('greeting-sub').innerHTML = `Διαχειρίζεσαι το <b>${esc(r.name)}</b>`;
+
+    $('i-email').textContent = user.email;
+    $('i-rest').textContent = r.name;
+    $('i-role').textContent = ({owner:'Ιδιοκτήτης', manager:'Διαχειριστής', staff:'Προσωπικό'})[m.role] || m.role;
+    $('i-plan').textContent = ({basic:'Basic', pro:'Pro', enterprise:'Enterprise'})[r.plan] || r.plan;
+
+    // Subscription / trial status
+    if(hasActiveSub){
+      const until = sub.manual_paid_until || sub.current_period_end;
+      const untilStr = until ? new Date(until).toLocaleDateString('el-GR') : '—';
+      $('i-sub').innerHTML = `<span class="val green">Ενεργή</span> (έως ${untilStr})`;
+    } else if(daysLeft > 0){
+      $('i-sub').innerHTML = `<span class="val amber">Δοκιμή — ${daysLeft} ${daysLeft===1?'ημέρα':'ημέρες'}</span>`;
+    } else {
+      $('i-sub').innerHTML = `<span style="color:var(--red);font-weight:700">Έληξε</span>`;
+    }
+
+    // Trial banner (only if no active sub)
+    const slot = $('trial-banner-slot');
+    slot.innerHTML = '';
+    if(!hasActiveSub){
+      if(daysLeft > 3){
+        slot.innerHTML = `<div class="trial-banner">
+          <span class="trial-icon">🎁</span>
+          <div class="trial-body">Δωρεάν δοκιμή — <b>${daysLeft} ${daysLeft===1?'ημέρα':'ημέρες'}</b> ακόμα. Όλα τα features διαθέσιμα.</div>
+        </div>`;
+      } else if(daysLeft > 0){
+        slot.innerHTML = `<div class="trial-banner warn">
+          <span class="trial-icon">⏰</span>
+          <div class="trial-body">Η δοκιμή λήγει σε <b>${daysLeft} ${daysLeft===1?'ημέρα':'ημέρες'}</b>. Αναβάθμισε για να συνεχίσεις.</div>
+        </div>`;
+      } else {
+        slot.innerHTML = `<div class="trial-banner warn">
+          <span class="trial-icon">🚫</span>
+          <div class="trial-body"><b>Η δοκιμή έληξε.</b> Παρακαλώ αναβάθμισε για να συνεχίσεις.</div>
+        </div>`;
+      }
+    }
+
+  } catch(err){
+    console.error('Dashboard load failed:', err);
+    $('greeting').textContent = 'Σφάλμα φόρτωσης';
+    $('greeting-sub').textContent = friendlyError(err);
+  }
+}
+
+// ─── INITIAL BOOT: check existing session ────────────────────────────────
+async function boot(){
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session){
+      await loadDashboard();
+    } else {
+      hide('boot');
+      show('view-auth');
+    }
+  } catch(err){
+    console.error('Boot error:', err);
+    hide('boot');
+    show('view-auth');
+    msg($('msg-signin'), 'err', 'Πρόβλημα σύνδεσης με τον server. Δοκίμασε ξανά.');
+  }
+}
+
+// Listen for auth changes (logout in another tab, token refresh, etc.)
+sb.auth.onAuthStateChange((event, session) => {
+  if(event === 'SIGNED_OUT'){
+    hide('view-dash');
+    show('view-auth');
+  }
+});
+
+// Wait for Supabase SDK to be ready
+if(window.supabase){
+  boot();
+} else {
+  window.addEventListener('load', boot);
+}
+
+// Enter key submits whichever panel is visible
+document.addEventListener('keydown', (e) => {
+  if(e.key !== 'Enter') return;
+  if(!$('view-auth').classList.contains('hidden')){
+    if(!$('panel-signin').classList.contains('hidden')) $('btn-signin').click();
+    else $('btn-signup').click();
+  }
+});
+</script>
+</body>
+</html>
