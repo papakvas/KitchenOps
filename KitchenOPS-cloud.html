@@ -260,6 +260,85 @@ input::placeholder{color:var(--muted)}
 /* ── FAB (floating action button for primary add) ── */
 .fab{position:fixed;right:14px;bottom:calc(76px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;background:var(--amber);color:var(--on-amber);border:none;font-family:var(--hd);font-size:32px;font-weight:400;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(232,160,69,.35);z-index:40}
 .fab:active{transform:scale(.94)}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PHASE 2C.2 — Βάρδια (Checklist) + Παραγγελίες (Orders)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── CHECKLIST ROWS ── */
+.chk-row{background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.chk-row.on{border-color:var(--amber);background:var(--amber-dim)}
+.chk-row:active{background:var(--panel2)}
+.chk-row.on:active{background:var(--amber-dim)}
+.chk-checkbox{width:22px;height:22px;border-radius:5px;border:2px solid var(--border2);background:var(--dark);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--on-amber);font-size:14px;font-weight:700}
+.chk-row.on .chk-checkbox{background:var(--amber);border-color:var(--amber)}
+.chk-icon{font-size:20px;line-height:1;flex-shrink:0;width:28px;text-align:center}
+.chk-body{flex:1;min-width:0}
+.chk-name{font-family:var(--cond);font-size:13px;font-weight:700;color:var(--cream);letter-spacing:.3px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chk-meta{font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;margin-top:2px}
+.chk-meta b{color:var(--cream2)}
+.chk-stock{font-family:var(--hd);font-size:18px;color:var(--cream2);letter-spacing:1px}
+.chk-stock.low{color:var(--red)}
+.chk-qrow{display:flex;align-items:center;gap:4px;margin-left:auto;background:var(--dark);border:1.5px solid var(--border);border-radius:var(--rm);padding:2px}
+.chk-qrow button{width:28px;height:28px;border-radius:var(--r);background:transparent;border:none;color:var(--cream);font-family:var(--hd);font-size:16px;cursor:pointer;line-height:1}
+.chk-qrow button:active{background:var(--panel2)}
+.chk-qrow input{width:38px;background:transparent;border:none;color:var(--cream);text-align:center;font-family:var(--hd);font-size:16px;letter-spacing:.5px;padding:0;-moz-appearance:textfield}
+.chk-qrow input::-webkit-inner-spin-button,.chk-qrow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* ── ACTION BAR (sticky bottom on checklist + receive modal) ── */
+.action-bar{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom));background:var(--dark);border-top:1.5px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:30;transform:translateY(120%);transition:transform .2s ease}
+.action-bar.show{transform:translateY(0)}
+.action-bar-info{flex:1;font-family:var(--cond);font-size:13px;font-weight:700;color:var(--cream);letter-spacing:.5px}
+.action-bar-info span{color:var(--amber);font-size:15px}
+.action-bar .btn{padding:11px 16px;font-size:12px;margin:0;flex:0}
+
+/* ── ORDERS LIST ── */
+.ord-card{background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.ord-card:active{background:var(--panel2)}
+.ord-status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--muted)}
+.ord-status-dot.new{background:var(--amber)}
+.ord-status-dot.pending{background:var(--blue)}
+.ord-status-dot.done{background:var(--green)}
+.ord-status-dot.partial{background:#d97706}
+.ord-body{flex:1;min-width:0}
+.ord-title{font-family:var(--cond);font-size:14px;font-weight:700;color:var(--cream);letter-spacing:.3px;line-height:1.2;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ord-meta{font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--muted);text-transform:uppercase}
+.ord-stats{display:flex;align-items:center;gap:6px;font-family:var(--cond);font-size:11px;color:var(--cream2)}
+.ord-stats .pill{padding:3px 8px;border-radius:99px;background:var(--dark);border:1.5px solid var(--border);font-weight:700;letter-spacing:.5px}
+
+/* Status filter chips (re-use .chips style) */
+
+/* ── ORDER DETAIL DRAWER ── */
+.ord-detail-ov{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(3px)}
+.ord-detail-ov.show{display:flex;animation:fadeIn .14s ease}
+.ord-detail-drawer{background:var(--panel);border:1.5px solid var(--border2);border-top-left-radius:14px;border-top-right-radius:14px;width:100%;max-width:560px;max-height:92dvh;display:flex;flex-direction:column;animation:slideUp .2s ease;padding-bottom:env(safe-area-inset-bottom)}
+.ord-detail-head{padding:14px 16px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ord-detail-title{font-family:var(--hd);font-size:20px;letter-spacing:1px;color:var(--cream);line-height:1.1}
+.ord-detail-sub{font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.ord-detail-body{padding:14px 16px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.ord-detail-foot{padding:10px 14px 12px;border-top:1.5px solid var(--border);display:flex;gap:6px}
+
+/* Status pills */
+.status-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.status-btn{padding:7px 11px;background:var(--dark);border:1.5px solid var(--border2);border-radius:99px;color:var(--cream2);font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.status-btn.active-new{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
+.status-btn.active-pending{background:var(--blue);color:#fff;border-color:var(--blue)}
+.status-btn.active-done{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* Provider sub-card inside order detail */
+.ord-prov-card{background:var(--dark);border:1.5px solid var(--border);border-radius:var(--rm);padding:12px;margin-bottom:10px}
+.ord-prov-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ord-prov-name{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--cream)}
+.ord-prov-contact{font-family:var(--cond);font-size:10px;color:var(--muted);letter-spacing:.5px;margin-top:2px}
+.ord-prov-items{margin:6px 0 10px}
+.ord-prov-item{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-family:var(--cond);font-size:12px;border-bottom:1px dashed var(--border);color:var(--cream2)}
+.ord-prov-item:last-child{border-bottom:none}
+.ord-prov-item-q{color:var(--amber);font-weight:700}
+.ord-prov-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn-sm{padding:7px 10px;font-size:11px;letter-spacing:1px}
+
+/* Empty state for orders */
+/* (re-uses .empty class)*/
 </style>
 </head>
 <body>
@@ -276,8 +355,8 @@ input::placeholder{color:var(--muted)}
     <h1>⚠️ CONFIG MISSING</h1>
     <p>Πριν χρησιμοποιήσεις την εφαρμογή, πρέπει να συμπληρώσεις τα δικά σου Supabase credentials στην αρχή του αρχείου HTML.</p>
     <p>Άνοιξε το αρχείο με έναν text editor και βρες αυτές τις γραμμές:</p>
-    <code>const SUPABASE_URL = 'https://ybpvjnkmubowqukjtjgh.supabase.co';</code>
-    <code>const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicHZqbmttdWJvd3F1a2p0amdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDM2MjMsImV4cCI6MjA5NDA3OTYyM30.ZMeBlokB5k6Eg4g-NwvlVGKsjX0w6lvXf0ErFT9fQq0';</code>
+    <code>const SUPABASE_URL = '...';</code>
+    <code>const SUPABASE_ANON_KEY = '...';</code>
     <p>Αντικατάστησε τις τιμές με αυτές από το Supabase Dashboard → Settings → API.</p>
   </div>
 </div>
@@ -376,11 +455,11 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">📋 Phase 2C.1 — Αποθήκη Cloud</div>
+      <div class="info-card-title" style="color:var(--amber)">📋 Phase 2C.2 — Παραγγελίες Cloud</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
-        Προϊόντα, Προμηθευτές και Κατηγορίες είναι τώρα συγχρονισμένα στο cloud.
-        Λειτουργεί offline — οι αλλαγές συγχρονίζονται όταν επανέλθει το internet.
-        Στις επόμενες φάσεις: Παραγγελίες (2C.2) και Πρόγραμμα (2C.3).
+        Νέο: Βάρδια και Παραγγελίες με συγχρονισμένο stock. Λειτουργεί offline.
+        WhatsApp / email / αντιγραφή για κάθε προμηθευτή. 
+        Στο 2C.2b: κατάσταση Pending + Partial παραλαβή + over-receipt.
       </p>
     </div>
 
@@ -390,7 +469,7 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2C.1<br/>
+      KitchenOPS Cloud · Phase 2C.2<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -404,6 +483,25 @@ input::placeholder{color:var(--muted)}
     </div>
     <div class="chips" id="products-cat-chips"></div>
     <div id="products-list"></div>
+  </main>
+
+  <!-- CHECKLIST page (Βάρδια) -->
+  <main class="page has-tabbar hidden" id="page-checklist">
+    <div class="page-title">Βάρδια</div>
+    <div class="page-sub">Επίλεξε προϊόντα και ποσότητες για παραγγελία</div>
+    <div class="search-bar">
+      <input type="text" id="check-search" placeholder="Αναζήτηση..." autocomplete="off"/>
+    </div>
+    <div class="chips" id="check-cat-chips"></div>
+    <div id="check-list"></div>
+  </main>
+
+  <!-- ORDERS page (Παραγγελίες) -->
+  <main class="page has-tabbar hidden" id="page-orders">
+    <div class="page-title">Παραγγελίες</div>
+    <div class="page-sub" id="orders-count">— παραγγελίες</div>
+    <div class="chips" id="orders-status-chips"></div>
+    <div id="orders-list"></div>
   </main>
 
   <!-- PROVIDERS page -->
@@ -426,25 +524,63 @@ input::placeholder{color:var(--muted)}
   <!-- FAB (changes per page) -->
   <button class="fab hidden" id="fab" title="Προσθήκη">+</button>
 
+  <!-- ACTION BAR (sticky on Βάρδια when items selected) -->
+  <div class="action-bar" id="action-bar">
+    <div class="action-bar-info"><span id="abar-count">0</span> επιλεγμένα</div>
+    <button class="btn btn-ghost" id="abar-clear" style="flex:0;padding:11px 14px">Καθαρισμός</button>
+    <button class="btn btn-amber" id="abar-save" style="flex:0;padding:11px 16px">Αποθήκευση Παραγγελίας</button>
+  </div>
+
   <!-- BOTTOM TABBAR -->
   <nav class="tabbar" id="tabbar">
-    <button class="tabbar-btn on" data-tab="home">
+    <button class="tabbar-btn on" data-tab="home" title="Αρχική">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12L12 4l9 8M5 10v10h14V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Αρχική</span>
     </button>
-    <button class="tabbar-btn" data-tab="products">
+    <button class="tabbar-btn" data-tab="checklist" title="Βάρδια">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Βάρδια</span>
+    </button>
+    <button class="tabbar-btn" data-tab="products" title="Αποθήκη">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z M3.27 6.96L12 12.01l8.73-5.05 M12 22.08V12" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Αποθήκη</span>
     </button>
-    <button class="tabbar-btn" data-tab="providers">
+    <button class="tabbar-btn" data-tab="orders" title="Παραγγελίες">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4 M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2 M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2 M9 12h6 M9 16h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Παραγγ.</span>
+    </button>
+    <button class="tabbar-btn" data-tab="providers" title="Προμηθευτές">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Προμηθ.</span>
     </button>
-    <button class="tabbar-btn" data-tab="categories">
+    <button class="tabbar-btn" data-tab="categories" title="Κατηγορίες">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Κατηγ.</span>
     </button>
   </nav>
+</div>
+
+<!-- ─── ORDER DETAIL DRAWER ─── -->
+<div class="ord-detail-ov" id="ord-detail-ov">
+  <div class="ord-detail-drawer">
+    <div class="ord-detail-head">
+      <div style="flex:1;min-width:0">
+        <div class="ord-detail-title" id="odd-title">Παραγγελία</div>
+        <div class="ord-detail-sub" id="odd-sub">—</div>
+      </div>
+      <button class="modal-close" data-close="ord-detail-ov">×</button>
+    </div>
+    <div class="ord-detail-body" id="odd-content">
+      <div class="status-row">
+        <button class="status-btn" data-status="new" id="ss-new">Νέα</button>
+        <button class="status-btn" data-status="done" id="ss-done">Ολοκληρώθηκε</button>
+      </div>
+      <div id="odd-provs"></div>
+    </div>
+    <div class="ord-detail-foot">
+      <button class="btn btn-ghost btn-sm" id="odd-del-btn" style="flex:1;color:var(--red);border-color:rgba(224,92,74,.4)">🗑 Διαγραφή</button>
+    </div>
+  </div>
 </div>
 
 <!-- ─── EDIT PRODUCT MODAL ─── -->
@@ -889,10 +1025,14 @@ async function loadDashboard(){
       setupTabbar();
       setupFab();
       setupModals();
+      setupChecklist();
+      setupOrderDetail();
       window._kc_ui_inited = true;
     }
     renderProducts(); renderProviders(); renderCategories();
     populateCatChips();
+    if(typeof renderOrders === 'function'){ renderOrders(); populateOrdersChips(); }
+    if(typeof renderChecklist === 'function'){ renderChecklist(); populateCheckCatChips(); }
     db.sync.flush(); // try to flush any pending writes from offline
   }
 }
@@ -961,7 +1101,7 @@ function confirmAction(title, message, onYes, yesLabel='Ναι'){
 // ════════════════════════════════════════════════════════════════════════
 const db = (() => {
   let rid = null;
-  let cache = { products: [], providers: [], categories: [] };
+  let cache = { products: [], providers: [], categories: [], orders: [] };
   let queue = []; // [{id, op:'upsert'|'delete', table, payload, seq, retries, lastErr}]
   let queueSeq = 0;
   let flushing = false;
@@ -973,6 +1113,7 @@ const db = (() => {
       prods: `kc:${rid}:products`,
       provs: `kc:${rid}:providers`,
       cats: `kc:${rid}:categories`,
+      orders: `kc:${rid}:orders`,
       queue: `kc:${rid}:queue`,
       seq: `kc:${rid}:seq`,
       meta: `kc:${rid}:meta`,
@@ -984,6 +1125,7 @@ const db = (() => {
     try { cache.products = JSON.parse(localStorage.getItem(k.prods) || '[]'); } catch { cache.products = []; }
     try { cache.providers = JSON.parse(localStorage.getItem(k.provs) || '[]'); } catch { cache.providers = []; }
     try { cache.categories = JSON.parse(localStorage.getItem(k.cats) || '[]'); } catch { cache.categories = []; }
+    try { cache.orders = JSON.parse(localStorage.getItem(k.orders) || '[]'); } catch { cache.orders = []; }
     try { queue = JSON.parse(localStorage.getItem(k.queue) || '[]'); } catch { queue = []; }
     try { queueSeq = parseInt(localStorage.getItem(k.seq) || '0', 10) || 0; } catch { queueSeq = 0; }
   }
@@ -993,6 +1135,7 @@ const db = (() => {
     if(!part || part==='products') localStorage.setItem(k.prods, JSON.stringify(cache.products));
     if(!part || part==='providers') localStorage.setItem(k.provs, JSON.stringify(cache.providers));
     if(!part || part==='categories') localStorage.setItem(k.cats, JSON.stringify(cache.categories));
+    if(!part || part==='orders') localStorage.setItem(k.orders, JSON.stringify(cache.orders || []));
   }
   function saveQueue(){
     const k = keys();
@@ -1076,12 +1219,13 @@ const db = (() => {
   async function pullAll(){
     if(!onlineNow) return;
     try {
-      const [cats, provs, prods] = await Promise.all([
+      const [cats, provs, prods, ords] = await Promise.all([
         sb.from('categories').select('*').eq('restaurant_id', rid).order('sort_order'),
         sb.from('providers').select('*').eq('restaurant_id', rid).order('name'),
         sb.from('products').select('*').eq('restaurant_id', rid).order('name'),
+        sb.from('orders').select('*').eq('restaurant_id', rid).order('created_at', { ascending: false }),
       ]);
-      if(cats.error || provs.error || prods.error) throw (cats.error || provs.error || prods.error);
+      if(cats.error || provs.error || prods.error || ords.error) throw (cats.error || provs.error || prods.error || ords.error);
 
       // Merge with cache: server is authoritative for already-synced rows;
       // but locally-pending rows in queue stay until they sync.
@@ -1093,10 +1237,14 @@ const db = (() => {
         .concat(cache.providers.filter(r => pendingIds.has(r.id)));
       cache.products = (prods.data || []).filter(r => !pendingIds.has(r.id))
         .concat(cache.products.filter(r => pendingIds.has(r.id)));
+      cache.orders = (ords.data || []).filter(r => !pendingIds.has(r.id))
+        .concat((cache.orders || []).filter(r => pendingIds.has(r.id)));
 
       saveCache();
       renderProducts(); renderProviders(); renderCategories();
       populateCatChips();
+      if(typeof renderOrders === 'function') renderOrders();
+      if(typeof renderChecklist === 'function') renderChecklist();
     } catch(err){
       console.warn('pullAll failed (will use cache):', err);
     }
@@ -1107,7 +1255,7 @@ const db = (() => {
     async init(restaurantId){
       // Reset in-memory state in case re-initing with a different restaurant
       rid = restaurantId;
-      cache = { products: [], providers: [], categories: [] };
+      cache = { products: [], providers: [], categories: [], orders: [] };
       queue = [];
       queueSeq = 0;
       flushing = false;
@@ -1275,6 +1423,125 @@ const db = (() => {
         p.updated_at = new Date().toISOString();
         saveCache('products');
         enqueue('upsert', 'products', p);
+      },
+    },
+
+    orders: {
+      list: () => cache.orders ? cache.orders.slice() : [],
+      get: (id) => (cache.orders || []).find(o => o.id === id),
+      // Create order from { productId: qty } selection. Decrements stock.
+      // Each order item is a snapshot (so deletion of products later doesn't break the order).
+      create(selection){
+        const now = new Date().toISOString();
+        const items = [];
+        for(const [pid, qty] of Object.entries(selection)){
+          const p = cache.products.find(x => x.id === pid);
+          if(!p || qty <= 0) continue;
+          items.push({
+            productId: p.id,
+            product: { // snapshot
+              id: p.id,
+              name: p.name,
+              sku: p.sku,
+              category: p.category_name,
+              provider: p.provider_name,
+              provider_id: p.provider_id,
+            },
+            usedQuantity: +qty,
+            creditedQty: 0, // becomes positive when stock returns on receive/done
+          });
+          // Decrement stock immediately
+          p.quantity = Math.max(0, (+p.quantity || 0) - +qty);
+          p.updated_at = now;
+          enqueue('upsert', 'products', p);
+        }
+        if(items.length === 0) return null;
+        saveCache('products');
+
+        const dateStr = now.slice(0, 10); // YYYY-MM-DD
+        const timeStr = new Date().toTimeString().slice(0, 5); // HH:MM
+        const order = {
+          id: uid(),
+          restaurant_id: rid,
+          parent_order_id: null,
+          title: `Παραγγελία ${dateStr}`,
+          status: 'new',
+          items,
+          ordered_date: dateStr,
+          ordered_time: timeStr,
+          received_at: null,
+          created_by: currentUserId,
+          received_by: null,
+          created_at: now,
+          updated_at: now,
+        };
+        cache.orders = cache.orders || [];
+        cache.orders.unshift(order);
+        saveCache('orders');
+        enqueue('upsert', 'orders', order);
+        return order;
+      },
+      // Set status. Handles stock credits/rollbacks based on transition.
+      // For 2C.2 minimum-viable: only new <-> done transitions.
+      setStatus(id, newStatus){
+        const o = (cache.orders || []).find(x => x.id === id);
+        if(!o) return;
+        const oldStatus = o.status;
+        if(oldStatus === newStatus) return;
+        const now = new Date().toISOString();
+        // Compute credit delta per item: target credit - current credit
+        // new -> done: target = usedQuantity (credit full)
+        // done -> new: target = 0 (rollback)
+        const targetCredit = (newStatus === 'done') ? null /* per-item */ : 0;
+        o.items.forEach(item => {
+          const target = (targetCredit === null) ? item.usedQuantity : targetCredit;
+          const delta = target - (item.creditedQty || 0);
+          if(delta !== 0){
+            const p = cache.products.find(x => x.id === item.productId);
+            if(p){
+              p.quantity = Math.max(0, (+p.quantity || 0) + delta);
+              p.updated_at = now;
+              enqueue('upsert', 'products', p);
+            }
+            item.creditedQty = target;
+          }
+        });
+        o.status = newStatus;
+        if(newStatus === 'done'){
+          o.received_at = now;
+          o.received_by = currentUserId;
+        } else {
+          o.received_at = null;
+          o.received_by = null;
+        }
+        o.updated_at = now;
+        saveCache('products');
+        saveCache('orders');
+        enqueue('upsert', 'orders', o);
+      },
+      delete(id){
+        const o = (cache.orders || []).find(x => x.id === id);
+        if(!o) return;
+        const now = new Date().toISOString();
+        // Roll back any credits AND restore deducted stock
+        // Net effect: stock should return to "as if order never existed"
+        //   currentStockDelta = -usedQuantity + creditedQty
+        //   on delete, we undo that: +usedQuantity - creditedQty
+        o.items.forEach(item => {
+          const undoDelta = (+item.usedQuantity || 0) - (+item.creditedQty || 0);
+          if(undoDelta !== 0){
+            const p = cache.products.find(x => x.id === item.productId);
+            if(p){
+              p.quantity = Math.max(0, (+p.quantity || 0) + undoDelta);
+              p.updated_at = now;
+              enqueue('upsert', 'products', p);
+            }
+          }
+        });
+        cache.orders = (cache.orders || []).filter(x => x.id !== id);
+        saveCache('products');
+        saveCache('orders');
+        enqueue('delete', 'orders', { id });
       },
     },
   };
@@ -1879,6 +2146,429 @@ async function confirmImport(){
 
 // ════════════════════════════════════════════════════════════════════════
 // END PHASE 2C.1
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// PHASE 2C.2 — Βάρδια (Checklist) + Παραγγελίες (Orders)
+// ════════════════════════════════════════════════════════════════════════
+
+// ─── Helpers ported from Phase 1 ─────────────────────────────────────────
+const CATEGORY_UNITS = {
+  'Κρέατα':'κιλά','Ψάρια & Θαλασσινά':'κιλά','Λαχανικά & Φρούτα':'κιλά',
+  'Γαλακτοκομικά':'τεμάχια','Ποτά':'τεμάχια','Καφές & Ροφήματα':'συσκευασίες',
+  'Αρτοσκευάσματα':'τεμάχια','Ζαχαροπλαστική':'τεμάχια','Άλλα':'τεμάχια',
+};
+function unitForQty(qty, baseUnit){
+  if(qty === 1){
+    if(baseUnit === 'κιλά') return 'κιλό';
+    if(baseUnit === 'τεμάχια') return 'τεμάχιο';
+    if(baseUnit === 'συσκευασίες') return 'συσκευασία';
+  }
+  return baseUnit;
+}
+function greeting(){
+  const h = new Date().getHours();
+  return (h >= 5 && h < 13) ? 'Καλημέρα' : 'Καλησπέρα';
+}
+function buildOrderMessage(items){
+  if(!items || !items.length) return '';
+  const lines = items.map(i => {
+    const baseUnit = CATEGORY_UNITS[i.product.category] || 'τεμάχια';
+    const unit = unitForQty(i.usedQuantity, baseUnit);
+    const sku = i.product.sku ? ` (${i.product.sku})` : '';
+    return `• ${i.product.name} ${i.usedQuantity} ${unit}${sku}`;
+  }).join('\n');
+  return `${greeting()},\n\nΘα ήθελα να παραγγείλω:\n\n${lines}\n\nΕυχαριστώ!`;
+}
+function formatGreekDate(isoDate){
+  if(!isoDate) return '—';
+  const parts = isoDate.split('-');
+  if(parts.length !== 3) return isoDate;
+  const months = ['Ιαν','Φεβ','Μαρ','Απρ','Μαϊ','Ιουν','Ιουλ','Αυγ','Σεπ','Οκτ','Νοε','Δεκ'];
+  return `${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+}
+// Normalize phone number for wa.me — digits only
+function waNumber(phone){
+  if(!phone) return '';
+  return String(phone).replace(/[^\d]/g, '');
+}
+
+// ─── CHECKLIST (Βάρδια) ──────────────────────────────────────────────────
+let checkSel = {};  // {productId: qty}
+let checkFilter = { catId: null };
+
+function populateCheckCatChips(){
+  const host = $('check-cat-chips');
+  if(!host) return;
+  const cats = db.categories.list();
+  const total = db.products.list().length;
+  host.innerHTML = `<button class="chip ${checkFilter.catId===null?'on':''}" data-check-cat="">Όλα <b>${total}</b></button>` +
+    cats.map(c => {
+      const n = db.products.list().filter(p => p.category_id === c.id).length;
+      if(n === 0) return ''; // hide empty cats
+      const active = checkFilter.catId === c.id;
+      return `<button class="chip ${active?'on':''}" data-check-cat="${esc(c.id)}">${c.icon} ${esc(c.name)} <b>${n}</b></button>`;
+    }).join('');
+  host.querySelectorAll('[data-check-cat]').forEach(b => {
+    b.addEventListener('click', () => {
+      checkFilter.catId = b.dataset.checkCat || null;
+      populateCheckCatChips();
+      renderChecklist();
+    });
+  });
+}
+
+function renderChecklist(){
+  const list = $('check-list');
+  if(!list) return;
+  const q = ($('check-search').value || '').toLowerCase().trim();
+  let items = db.products.list();
+  if(checkFilter.catId) items = items.filter(p => p.category_id === checkFilter.catId);
+  if(q){
+    items = items.filter(p =>
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.sku || '').toLowerCase().includes(q));
+  }
+  items.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'el'));
+
+  if(items.length === 0){
+    list.innerHTML = `<div class="empty">
+      <div class="empty-icon">🍽</div>
+      <div class="empty-title">${q || checkFilter.catId ? 'Κανένα αποτέλεσμα' : 'Δεν έχεις προϊόντα'}</div>
+      <div class="empty-sub">${q || checkFilter.catId ? 'Δοκίμασε άλλη αναζήτηση' : 'Πρόσθεσε προϊόντα από την Αποθήκη πρώτα'}</div>
+    </div>`;
+    updateActionBar();
+    return;
+  }
+
+  list.innerHTML = items.map(p => {
+    const cat = p.category_id ? db.categories.get(p.category_id) : null;
+    const icon = cat ? cat.icon : '📦';
+    const low = (+p.quantity || 0) < 5;
+    const isSel = checkSel[p.id] != null;
+    const qty = checkSel[p.id] || 1;
+    return `<div class="chk-row ${isSel?'on':''}" data-pid="${esc(p.id)}">
+      <span class="chk-checkbox">${isSel?'✓':''}</span>
+      <span class="chk-icon">${icon}</span>
+      <div class="chk-body">
+        <div class="chk-name">${esc(p.name)}</div>
+        <div class="chk-meta">${esc(p.sku)} · stock <b>${+p.quantity || 0}</b></div>
+      </div>
+      ${isSel ? `
+      <div class="chk-qrow" data-qrow="${esc(p.id)}">
+        <button data-chk-step="${esc(p.id)}:-1">−</button>
+        <input type="number" value="${qty}" data-chk-input="${esc(p.id)}" inputmode="numeric"/>
+        <button data-chk-step="${esc(p.id)}:1">+</button>
+      </div>` : `<span class="chk-stock ${low?'low':''}">${+p.quantity || 0}</span>`}
+    </div>`;
+  }).join('');
+
+  // Wire row clicks (toggle selection)
+  list.querySelectorAll('.chk-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      // Don't toggle if clicking quantity stepper or input
+      if(e.target.closest('[data-chk-step], [data-chk-input], .chk-qrow')) return;
+      const pid = row.dataset.pid;
+      if(checkSel[pid] != null) delete checkSel[pid];
+      else checkSel[pid] = 1;
+      renderChecklist();
+    });
+  });
+  // Wire quantity steppers
+  list.querySelectorAll('[data-chk-step]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const [pid, delta] = btn.dataset.chkStep.split(':');
+      checkSel[pid] = Math.max(1, (checkSel[pid] || 1) + parseInt(delta, 10));
+      renderChecklist();
+    });
+  });
+  list.querySelectorAll('[data-chk-input]').forEach(inp => {
+    inp.addEventListener('click', (e) => e.stopPropagation());
+    inp.addEventListener('change', (e) => {
+      e.stopPropagation();
+      const pid = inp.dataset.chkInput;
+      const n = parseInt(inp.value, 10);
+      if(!isNaN(n) && n >= 1) checkSel[pid] = n;
+      else { inp.value = checkSel[pid] || 1; }
+    });
+  });
+
+  updateActionBar();
+}
+
+function updateActionBar(){
+  const bar = $('action-bar');
+  const count = Object.keys(checkSel).length;
+  $('abar-count').textContent = count;
+  bar.classList.toggle('show', count > 0);
+  // Push the body up to clear the action bar
+  document.body.classList.toggle('has-action-bar', count > 0);
+}
+
+function setupChecklist(){
+  $('check-search').addEventListener('input', renderChecklist);
+  $('abar-clear').addEventListener('click', () => {
+    if(Object.keys(checkSel).length === 0) return;
+    confirmAction('Καθαρισμός', 'Να καθαριστούν όλες οι επιλογές;', () => {
+      checkSel = {};
+      renderChecklist();
+    }, 'Καθαρισμός');
+  });
+  $('abar-save').addEventListener('click', () => {
+    const count = Object.keys(checkSel).length;
+    if(count === 0) return;
+    confirmAction(
+      'Αποθήκευση Παραγγελίας',
+      `Να δημιουργηθεί παραγγελία με ${count} ${count===1?'προϊόν':'προϊόντα'}; Το stock θα μειωθεί ανάλογα.`,
+      () => {
+        const order = db.orders.create(checkSel);
+        if(!order){ toast('Σφάλμα δημιουργίας', 'err'); return; }
+        checkSel = {};
+        renderChecklist();
+        renderProducts();
+        renderOrders();
+        populateCatChips();
+        toast('✓ Παραγγελία δημιουργήθηκε', 'ok');
+        switchTab('orders');
+        setTimeout(() => openOrderDetail(order.id), 250);
+      },
+      'Αποθήκευση'
+    );
+  });
+}
+
+// ─── ORDERS (Παραγγελίες) ────────────────────────────────────────────────
+let ordersFilter = 'all'; // 'all' | 'new' | 'done'
+
+function populateOrdersChips(){
+  const host = $('orders-status-chips');
+  if(!host) return;
+  const all = db.orders.list();
+  const counts = {
+    all: all.length,
+    new: all.filter(o => o.status === 'new').length,
+    done: all.filter(o => o.status === 'done').length,
+  };
+  const opts = [
+    { key:'all', label:'Όλες' },
+    { key:'new', label:'Νέες' },
+    { key:'done', label:'Ολοκληρωμένες' },
+  ];
+  host.innerHTML = opts.map(o => {
+    const active = ordersFilter === o.key;
+    return `<button class="chip ${active?'on':''}" data-ord-filter="${o.key}">${o.label} <b>${counts[o.key]}</b></button>`;
+  }).join('');
+  host.querySelectorAll('[data-ord-filter]').forEach(b => {
+    b.addEventListener('click', () => {
+      ordersFilter = b.dataset.ordFilter;
+      populateOrdersChips();
+      renderOrders();
+    });
+  });
+}
+
+function renderOrders(){
+  const list = $('orders-list');
+  if(!list) return;
+  let items = db.orders.list();
+  if(ordersFilter !== 'all') items = items.filter(o => o.status === ordersFilter);
+  // Sort by created_at descending
+  items.sort((a,b) => (b.created_at || '').localeCompare(a.created_at || ''));
+
+  $('orders-count').textContent = `${items.length} ${items.length===1?'παραγγελία':'παραγγελίες'}`;
+
+  if(items.length === 0){
+    list.innerHTML = `<div class="empty">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">${ordersFilter==='all' ? 'Καμία παραγγελία ακόμα' : 'Καμία ' + (ordersFilter==='new'?'νέα':'ολοκληρωμένη')}</div>
+      <div class="empty-sub">Δημιούργησε παραγγελία από την οθόνη Βάρδια</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(o => {
+    const itemCount = (o.items || []).length;
+    const totalQty = (o.items || []).reduce((s, i) => s + (+i.usedQuantity || 0), 0);
+    const statusLabel = ({new:'Νέα', done:'Ολοκληρώθηκε'})[o.status] || o.status;
+    return `<div class="ord-card" data-oid="${esc(o.id)}">
+      <span class="ord-status-dot ${o.status}"></span>
+      <div class="ord-body">
+        <div class="ord-title">${esc(o.title || 'Παραγγελία')}</div>
+        <div class="ord-meta">${formatGreekDate(o.ordered_date)} · ${esc(o.ordered_time || '')}  ·  ${statusLabel}</div>
+      </div>
+      <div class="ord-stats">
+        <span class="pill">${itemCount} γρ.</span>
+        <span class="pill">${totalQty} τεμ.</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.ord-card').forEach(card => {
+    card.addEventListener('click', () => openOrderDetail(card.dataset.oid));
+  });
+}
+
+function openOrderDetail(oid){
+  const o = db.orders.get(oid);
+  if(!o) return;
+  currentOpenOrderId = oid;
+
+  $('odd-title').textContent = o.title || 'Παραγγελία';
+  $('odd-sub').textContent = `${formatGreekDate(o.ordered_date)} · ${o.ordered_time || ''} · ${(o.items || []).length} γραμμές`;
+
+  // Status row (minimum viable: only new <-> done)
+  ['new','done'].forEach(s => {
+    const btn = $('ss-' + s);
+    if(btn){
+      btn.className = 'status-btn' + (o.status === s ? ' active-' + s : '');
+      btn.onclick = () => {
+        if(o.status === s) return;
+        const action = s === 'done' ? 'Ολοκληρωμένη (παρέλαβα)' : 'Νέα (αναμένει)';
+        const desc = s === 'done'
+          ? 'Επιβεβαιώνεις παραλαβή όλων των προϊόντων; Το stock θα ενημερωθεί.'
+          : 'Να επαναφερθεί η παραγγελία σε «Νέα»; Το stock θα διορθωθεί ανάλογα.';
+        confirmAction('Αλλαγή κατάστασης: ' + action, desc, () => {
+          db.orders.setStatus(o.id, s);
+          renderProducts(); renderOrders(); populateCatChips();
+          openOrderDetail(o.id); // refresh
+          toast('✓ Κατάσταση: ' + action.split(' ')[0], 'ok');
+        });
+      };
+    }
+  });
+
+  // Delete button
+  $('odd-del-btn').onclick = () => {
+    confirmAction('Διαγραφή Παραγγελίας',
+      'Θέλεις να διαγράψεις αυτή την παραγγελία; Το stock θα επιστρέψει στην αρχική κατάσταση.',
+      () => {
+        db.orders.delete(o.id);
+        closeOrderDetail();
+        renderProducts(); renderOrders(); populateCatChips();
+        toast('Παραγγελία διαγράφηκε', 'ok');
+      },
+      'Διαγραφή'
+    );
+  };
+
+  // Build provider breakdown
+  const byProv = {};
+  (o.items || []).forEach(item => {
+    const pn = item.product.provider || 'Χωρίς προμηθευτή';
+    if(!byProv[pn]) byProv[pn] = [];
+    byProv[pn].push(item);
+  });
+
+  const pns = Object.keys(byProv);
+  const provHtml = pns.map(pn => {
+    const items = byProv[pn];
+    const pv = db.providers.getByName(pn) || { name: pn, phone: '', email: '', notes: '' };
+    const msg = buildOrderMessage(items);
+    const msgEnc = encodeURIComponent(msg);
+    const waN = waNumber(pv.phone);
+    const itemsHtml = items.map(i => `
+      <div class="ord-prov-item">
+        <span>${esc(i.product.name)} ${i.product.sku ? '<span style="color:var(--muted);font-size:10px">('+esc(i.product.sku)+')</span>' : ''}</span>
+        <span class="ord-prov-item-q">${i.usedQuantity} ${unitForQty(i.usedQuantity, CATEGORY_UNITS[i.product.category] || 'τεμ')}</span>
+      </div>
+    `).join('');
+    return `<div class="ord-prov-card">
+      <div class="ord-prov-head">
+        <div style="flex:1;min-width:0">
+          <div class="ord-prov-name">${esc(pv.name)}</div>
+          ${pv.phone || pv.email ? `<div class="ord-prov-contact">${esc(pv.phone || '')}${pv.phone && pv.email ? ' · ' : ''}${esc(pv.email || '')}</div>` : ''}
+        </div>
+      </div>
+      <div class="ord-prov-items">${itemsHtml}</div>
+      <div class="ord-prov-actions">
+        ${pv.phone ? `<a class="btn btn-ghost btn-sm" href="tel:${esc(pv.phone)}">📞 Κλήση</a>` : ''}
+        ${pv.phone && waN ? `<a class="btn btn-ghost btn-sm" href="https://wa.me/${esc(waN)}?text=${msgEnc}" target="_blank" rel="noopener">💬 WhatsApp</a>` : ''}
+        ${pv.email ? `<a class="btn btn-ghost btn-sm" href="mailto:${esc(pv.email)}?subject=${encodeURIComponent('Παραγγελία ' + (o.ordered_date||''))}&body=${msgEnc}">📧 Email</a>` : ''}
+        <button class="btn btn-ghost btn-sm" data-copy-msg="${esc(msg)}">📋 Αντιγραφή</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  $('odd-provs').innerHTML = provHtml || '<div class="empty"><div class="empty-icon">🤔</div><div class="empty-sub">Δεν υπάρχουν στοιχεία</div></div>';
+
+  // Wire copy buttons
+  $('odd-provs').querySelectorAll('[data-copy-msg]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copyMsg;
+      try {
+        await navigator.clipboard.writeText(text);
+        toast('✓ Αντιγράφηκε', 'ok');
+      } catch {
+        // Fallback for browsers without clipboard API
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); toast('✓ Αντιγράφηκε', 'ok'); }
+        catch { toast('Σφάλμα αντιγραφής', 'err'); }
+        ta.remove();
+      }
+    });
+  });
+
+  $('ord-detail-ov').classList.add('show');
+}
+
+function closeOrderDetail(){
+  currentOpenOrderId = null;
+  $('ord-detail-ov').classList.remove('show');
+}
+
+let currentOpenOrderId = null;
+
+// Wire close button + backdrop
+function setupOrderDetail(){
+  document.querySelectorAll('[data-close="ord-detail-ov"]').forEach(el => {
+    el.addEventListener('click', closeOrderDetail);
+  });
+  $('ord-detail-ov').addEventListener('click', (e) => {
+    if(e.target.id === 'ord-detail-ov') closeOrderDetail();
+  });
+}
+
+// ─── Hook into existing setup flow ───────────────────────────────────────
+const _origSwitchTab = switchTab;
+switchTab = function(t){
+  // Hide action bar when leaving checklist
+  if(t !== 'checklist'){
+    document.body.classList.remove('has-action-bar');
+    $('action-bar').classList.remove('show');
+  }
+  currentTab = t;
+  document.querySelectorAll('.tabbar-btn').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  ['home','checklist','products','orders','providers','categories'].forEach(name => {
+    const el = $('page-' + name);
+    if(el) el.classList.toggle('hidden', name !== t);
+  });
+  // FAB visibility — only on edit screens (products/providers/categories)
+  const fab = $('fab');
+  if(t === 'products' || t === 'providers' || t === 'categories') fab.classList.remove('hidden');
+  else fab.classList.add('hidden');
+  // Re-show action bar if on checklist with selection
+  if(t === 'checklist' && Object.keys(checkSel).length > 0){
+    document.body.classList.add('has-action-bar');
+    $('action-bar').classList.add('show');
+  }
+  // Refresh content
+  if(t === 'checklist'){ populateCheckCatChips(); renderChecklist(); }
+  if(t === 'orders'){ populateOrdersChips(); renderOrders(); }
+};
+
+// CSS rule for body padding when action bar shows (push tabbar up)
+const _styleAB = document.createElement('style');
+_styleAB.textContent = `.has-action-bar .has-tabbar{padding-bottom:calc(132px + env(safe-area-inset-bottom)) !important}`;
+document.head.appendChild(_styleAB);
+
+// ════════════════════════════════════════════════════════════════════════
+// END PHASE 2C.2
 // ════════════════════════════════════════════════════════════════════════
 
 // ─── INITIAL BOOT: check existing session ────────────────────────────────
