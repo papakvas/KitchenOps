@@ -276,8 +276,8 @@ input::placeholder{color:var(--muted)}
     <h1>⚠️ CONFIG MISSING</h1>
     <p>Πριν χρησιμοποιήσεις την εφαρμογή, πρέπει να συμπληρώσεις τα δικά σου Supabase credentials στην αρχή του αρχείου HTML.</p>
     <p>Άνοιξε το αρχείο με έναν text editor και βρες αυτές τις γραμμές:</p>
-    <code>const SUPABASE_URL = '...';</code>
-    <code>const SUPABASE_ANON_KEY = '...';</code>
+    <code>const SUPABASE_URL = 'https://ybpvjnkmubowqukjtjgh.supabase.co';</code>
+    <code>const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicHZqbmttdWJvd3F1a2p0amdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDM2MjMsImV4cCI6MjA5NDA3OTYyM30.ZMeBlokB5k6Eg4g-NwvlVGKsjX0w6lvXf0ErFT9fQq0';</code>
     <p>Αντικατάστησε τις τιμές με αυτές από το Supabase Dashboard → Settings → API.</p>
   </div>
 </div>
@@ -1761,39 +1761,70 @@ function handleImportFilePicked(e){
 }
 
 function parseImportData(data){
-  // Old single-file format used 'ko_p', 'ko_v', 'ko_cats' as localStorage keys
-  // or could be a unified export object { products: [...], providers: [...], categories: [...] }
+  // Old single-file KitchenOPS uses these localStorage keys:
+  //   ko_p     → products array
+  //   ko_v     → providers OBJECT keyed by name: {"Name":{phone,email,notes}}
+  //   ko_cats  → categories array of {n, i}
+  // A backup JSON file is typically: { ko_p:[...], ko_v:{...}, ko_cats:[...] }
+  // But could also be: { products:[...], providers:[...]|{...}, categories:[...] }
+  // Or a bare array (just products).
   let cats = [], provs = [], prods = [];
 
+  // Helper: convert an object-map to an array, putting the key into a `name` field
+  const objectMapToArray = (obj, nameField = 'name') => {
+    if(!obj || typeof obj !== 'object') return [];
+    if(Array.isArray(obj)) return obj;
+    return Object.entries(obj).map(([key, val]) => {
+      if(val && typeof val === 'object') return { [nameField]: key, ...val };
+      return { [nameField]: key };
+    });
+  };
+
   if(Array.isArray(data)){
-    // Could be just products
     prods = data;
   } else if(data && typeof data === 'object'){
-    cats = data.categories || data.ko_cats || data.cats || [];
-    provs = data.providers || data.ko_v || data.provs || [];
-    prods = data.products || data.ko_p || data.prods || [];
+    const rawCats = data.categories || data.ko_cats || data.cats || [];
+    const rawProvs = data.providers || data.ko_v || data.provs || [];
+    const rawProds = data.products || data.ko_p || data.prods || [];
+
+    // Categories: accept array OR object-map
+    cats = Array.isArray(rawCats) ? rawCats : objectMapToArray(rawCats, 'name');
+    // Providers: accept array OR object-map (the common case for ko_v)
+    provs = Array.isArray(rawProvs) ? rawProvs : objectMapToArray(rawProvs, 'name');
+    // Products: should always be an array, but be defensive
+    prods = Array.isArray(rawProds) ? rawProds : objectMapToArray(rawProds, 'name');
   }
 
-  // Normalize old shapes
+  // Normalize each item shape
   cats = cats.map(c => {
     if(typeof c === 'string') return { name: c, icon: '📦' };
+    if(!c || typeof c !== 'object') return null;
     return { name: c.name || c.n, icon: c.icon || c.i || '📦' };
-  }).filter(c => c.name);
+  }).filter(c => c && c.name);
 
   provs = provs.map(p => {
     if(typeof p === 'string') return { name: p };
-    return { name: p.name, phone: p.phone || '', email: p.email || '', notes: p.notes || '' };
-  }).filter(p => p.name);
+    if(!p || typeof p !== 'object') return null;
+    return {
+      name: p.name,
+      phone: p.phone || '',
+      email: p.email || '',
+      notes: p.notes || ''
+    };
+  }).filter(p => p && p.name);
 
-  prods = prods.map(p => ({
-    name: p.name,
-    sku: p.sku || (p.name || '').slice(0,3).toUpperCase() + '-' + Math.random().toString(36).slice(2,5).toUpperCase(),
-    category_name: p.category || p.category_name || null,
-    provider_name: p.provider || p.provider_name || null,
-    quantity: +(p.quantity || p.qty || 0),
-    unit_price: +(p.unit_price || p.unitPrice || p.price || 0),
-    description: p.description || p.desc || '',
-  })).filter(p => p.name);
+  prods = prods.map(p => {
+    if(!p || typeof p !== 'object') return null;
+    return {
+      name: p.name,
+      sku: p.sku || (p.name || '').slice(0,3).toUpperCase() + '-' + Math.random().toString(36).slice(2,5).toUpperCase(),
+      category_name: p.category || p.category_name || null,
+      provider_name: p.provider || p.provider_name || null,
+      quantity: +(p.quantity || p.qty || 0),
+      unit_price: +(p.unit_price || p.unitPrice || p.price || 0),
+      description: p.description || p.desc || '',
+    };
+  }).filter(p => p && p.name);
 
   return { cats, provs, prods };
 }
