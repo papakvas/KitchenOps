@@ -324,6 +324,32 @@ input::placeholder{color:var(--muted)}
 .status-btn.active-new{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
 .status-btn.active-pending{background:var(--blue);color:#fff;border-color:var(--blue)}
 .status-btn.active-done{background:var(--green);color:#fff;border-color:var(--green)}
+.status-btn.active-partial{background:#d97706;color:#fff;border-color:#d97706}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PHASE 2C.2b — Receive modal (Partial / Over-receipt)
+   ════════════════════════════════════════════════════════════════════════ */
+.recv-info{display:flex;gap:8px;align-items:flex-start;background:var(--blue-dim);border:1.5px solid rgba(91,141,238,.4);border-radius:var(--rm);padding:10px 12px;margin-bottom:12px;font-family:var(--cond);font-size:12px;line-height:1.4;color:var(--cream)}
+.recv-info b{color:var(--blue);font-weight:700}
+
+.recv-prov{background:var(--dark);border:1.5px solid var(--border);border-radius:var(--rm);padding:10px;margin-bottom:8px}
+.recv-prov-name{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed var(--border)}
+
+.recv-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--border)}
+.recv-row:last-child{border-bottom:none}
+.recv-row-name{font-family:var(--cond);font-size:13px;font-weight:600;color:var(--cream);min-width:0}
+.recv-row-sku{display:block;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:2px}
+.recv-row-meta{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-align:right;min-width:62px;line-height:1.2}
+.recv-row.short .recv-row-meta{color:var(--red)}
+.recv-row.full .recv-row-meta{color:var(--green)}
+.recv-row.over .recv-row-meta{color:var(--blue)}
+
+.recv-stepper{display:flex;align-items:center;gap:2px;background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:2px}
+.recv-stepper button{width:28px;height:28px;border-radius:var(--r);background:transparent;border:none;color:var(--cream);font-family:var(--hd);font-size:16px;cursor:pointer;line-height:1}
+.recv-stepper button:disabled{opacity:.3;cursor:not-allowed}
+.recv-stepper button:not(:disabled):active{background:var(--panel2)}
+.recv-stepper input{width:42px;background:transparent;border:none;color:var(--cream);text-align:center;font-family:var(--hd);font-size:15px;letter-spacing:.5px;padding:0;-moz-appearance:textfield}
+.recv-stepper input::-webkit-inner-spin-button,.recv-stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
 /* Provider sub-card inside order detail */
 .ord-prov-card{background:var(--dark);border:1.5px solid var(--border);border-radius:var(--rm);padding:12px;margin-bottom:10px}
@@ -355,8 +381,8 @@ input::placeholder{color:var(--muted)}
     <h1>⚠️ CONFIG MISSING</h1>
     <p>Πριν χρησιμοποιήσεις την εφαρμογή, πρέπει να συμπληρώσεις τα δικά σου Supabase credentials στην αρχή του αρχείου HTML.</p>
     <p>Άνοιξε το αρχείο με έναν text editor και βρες αυτές τις γραμμές:</p>
-    <code>const SUPABASE_URL = '...';</code>
-    <code>const SUPABASE_ANON_KEY = '...';</code>
+    <code>const SUPABASE_URL = 'https://ybpvjnkmubowqukjtjgh.supabase.co';</code>
+    <code>const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicHZqbmttdWJvd3F1a2p0amdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDM2MjMsImV4cCI6MjA5NDA3OTYyM30.ZMeBlokB5k6Eg4g-NwvlVGKsjX0w6lvXf0ErFT9fQq0';</code>
     <p>Αντικατάστησε τις τιμές με αυτές από το Supabase Dashboard → Settings → API.</p>
   </div>
 </div>
@@ -455,11 +481,11 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">📋 Phase 2C.2 — Παραγγελίες Cloud</div>
+      <div class="info-card-title" style="color:var(--amber)">📋 Phase 2C.2b — Πλήρες Μοντέλο Παραγγελιών</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
-        Νέο: Βάρδια και Παραγγελίες με συγχρονισμένο stock. Λειτουργεί offline.
-        WhatsApp / email / αντιγραφή για κάθε προμηθευτή. 
-        Στο 2C.2b: κατάσταση Pending + Partial παραλαβή + over-receipt.
+        Όλες οι καταστάσεις: Νέα / Σε εξέλιξη / Ολοκληρωμένη / Μερική. 
+        Μερική παραλαβή με αυτόματη συμπληρωματική παραγγελία για ελλείποντα. 
+        Υποστήριξη πλεονάσματος (over-receipt). WhatsApp + email + αντιγραφή για κάθε προμηθευτή.
       </p>
     </div>
 
@@ -469,7 +495,7 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2C.2<br/>
+      KitchenOPS Cloud · Phase 2C.2b<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -573,12 +599,37 @@ input::placeholder{color:var(--muted)}
     <div class="ord-detail-body" id="odd-content">
       <div class="status-row">
         <button class="status-btn" data-status="new" id="ss-new">Νέα</button>
+        <button class="status-btn" data-status="pending" id="ss-pending">Σε εξέλιξη</button>
         <button class="status-btn" data-status="done" id="ss-done">Ολοκληρώθηκε</button>
+        <button class="status-btn" data-status="partial" id="ss-partial" style="display:none">Μερική</button>
       </div>
+      <button class="btn btn-amber" id="btn-receive" style="margin-bottom:14px">📦 Καταγραφή Παραλαβής</button>
       <div id="odd-provs"></div>
     </div>
     <div class="ord-detail-foot">
       <button class="btn btn-ghost btn-sm" id="odd-del-btn" style="flex:1;color:var(--red);border-color:rgba(224,92,74,.4)">🗑 Διαγραφή</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── RECEIVE MODAL (Παραλαβή) ─── -->
+<div class="modal-ov" id="recv-modal">
+  <div class="modal-sheet" style="max-width:560px">
+    <div class="modal-head">
+      <span class="modal-title">Καταγραφή Παραλαβής</span>
+      <button class="modal-close" data-close="recv-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="recv-info">
+        <span style="font-size:18px;line-height:1">📦</span>
+        <div>Σημείωσε τις ποσότητες <b>που πραγματικά παρέλαβες</b>. Το στοκ θα ενημερωθεί αυτόματα. Όσα λείπουν θα μπουν σε νέα παραγγελία.</div>
+      </div>
+      <div id="recv-content"></div>
+      <div id="recv-modal-msg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="recv-modal" style="flex:1">Άκυρο</button>
+      <button class="btn btn-amber" id="recv-save-btn" style="flex:2">Πλήρης Παραλαβή</button>
     </div>
   </div>
 </div>
@@ -1027,6 +1078,7 @@ async function loadDashboard(){
       setupModals();
       setupChecklist();
       setupOrderDetail();
+      setupReceiveModal();
       window._kc_ui_inited = true;
     }
     renderProducts(); renderProviders(); renderCategories();
@@ -1430,7 +1482,6 @@ const db = (() => {
       list: () => cache.orders ? cache.orders.slice() : [],
       get: (id) => (cache.orders || []).find(o => o.id === id),
       // Create order from { productId: qty } selection. Decrements stock.
-      // Each order item is a snapshot (so deletion of products later doesn't break the order).
       create(selection){
         const now = new Date().toISOString();
         const items = [];
@@ -1439,18 +1490,15 @@ const db = (() => {
           if(!p || qty <= 0) continue;
           items.push({
             productId: p.id,
-            product: { // snapshot
-              id: p.id,
-              name: p.name,
-              sku: p.sku,
-              category: p.category_name,
-              provider: p.provider_name,
+            product: {
+              id: p.id, name: p.name, sku: p.sku,
+              category: p.category_name, provider: p.provider_name,
               provider_id: p.provider_id,
             },
             usedQuantity: +qty,
-            creditedQty: 0, // becomes positive when stock returns on receive/done
+            receivedQuantity: 0,
+            creditedQty: 0,
           });
-          // Decrement stock immediately
           p.quantity = Math.max(0, (+p.quantity || 0) - +qty);
           p.updated_at = now;
           enqueue('upsert', 'products', p);
@@ -1458,8 +1506,8 @@ const db = (() => {
         if(items.length === 0) return null;
         saveCache('products');
 
-        const dateStr = now.slice(0, 10); // YYYY-MM-DD
-        const timeStr = new Date().toTimeString().slice(0, 5); // HH:MM
+        const dateStr = now.slice(0, 10);
+        const timeStr = new Date().toTimeString().slice(0, 5);
         const order = {
           id: uid(),
           restaurant_id: rid,
@@ -1481,21 +1529,15 @@ const db = (() => {
         enqueue('upsert', 'orders', order);
         return order;
       },
-      // Set status. Handles stock credits/rollbacks based on transition.
-      // For 2C.2 minimum-viable: only new <-> done transitions.
-      setStatus(id, newStatus){
-        const o = (cache.orders || []).find(x => x.id === id);
-        if(!o) return;
-        const oldStatus = o.status;
-        if(oldStatus === newStatus) return;
+
+      // Core stock-credit primitive. Applies `getTargetForItem(item) - item.creditedQty`
+      // delta to stock per item. Idempotent.
+      _applyReceiveTargets(order, getTargetForItem){
         const now = new Date().toISOString();
-        // Compute credit delta per item: target credit - current credit
-        // new -> done: target = usedQuantity (credit full)
-        // done -> new: target = 0 (rollback)
-        const targetCredit = (newStatus === 'done') ? null /* per-item */ : 0;
-        o.items.forEach(item => {
-          const target = (targetCredit === null) ? item.usedQuantity : targetCredit;
-          const delta = target - (item.creditedQty || 0);
+        order.items.forEach(item => {
+          const target = Math.max(0, getTargetForItem(item) | 0); // floor at 0
+          const credited = item.creditedQty || 0;
+          const delta = target - credited;
           if(delta !== 0){
             const p = cache.products.find(x => x.id === item.productId);
             if(p){
@@ -1503,30 +1545,132 @@ const db = (() => {
               p.updated_at = now;
               enqueue('upsert', 'products', p);
             }
-            item.creditedQty = target;
           }
+          item.creditedQty = target;
+          item.receivedQuantity = target;
         });
-        o.status = newStatus;
+        saveCache('products');
+        return now;
+      },
+
+      // Set status. Handles stock credits/rollbacks based on transition.
+      // States: new | pending | done | partial
+      // Stock semantics:
+      //   • create: stock -= usedQty
+      //   • -> done: target = usedQty (full credit)
+      //   • -> new/pending: target = 0 (rollback any credits)
+      //   • -> partial: handled via receive modal flow (use receive())
+      setStatus(id, newStatus){
+        const o = (cache.orders || []).find(x => x.id === id);
+        if(!o) return;
+        const oldStatus = o.status;
+        if(oldStatus === newStatus) return;
+
+        // For simple new/pending/done transitions: full credit or full rollback
         if(newStatus === 'done'){
-          o.received_at = now;
+          this._applyReceiveTargets(o, item => item.usedQuantity);
+          o.received_at = new Date().toISOString();
           o.received_by = currentUserId;
-        } else {
+        } else if(newStatus === 'new' || newStatus === 'pending'){
+          this._applyReceiveTargets(o, () => 0);
           o.received_at = null;
           o.received_by = null;
         }
-        o.updated_at = now;
-        saveCache('products');
+        // Note: 'partial' transition only via receive() — direct setStatus to partial doesn't make sense
+        // (we need actual received quantities for that)
+        o.status = newStatus;
+        o.updated_at = new Date().toISOString();
         saveCache('orders');
         enqueue('upsert', 'orders', o);
       },
+
+      // Receive: apply per-item received quantities + auto-create follow-up for shortages.
+      // receivedMap = { itemIndex: receivedQty }
+      // Returns: { newStatus, followUpOrder|null, totals: {received, short, over} }
+      receive(id, receivedMap){
+        const o = (cache.orders || []).find(x => x.id === id);
+        if(!o) return null;
+
+        let totalReceived = 0, totalShort = 0, totalOver = 0;
+        const missing = [];
+        o.items.forEach((item, idx) => {
+          const recv = receivedMap[idx] != null ? receivedMap[idx] : item.usedQuantity;
+          const short = item.usedQuantity - recv;
+          const over = recv - item.usedQuantity;
+          totalReceived += recv;
+          if(short > 0){ totalShort += short; missing.push({ orig: item, short, idx }); }
+          if(over > 0){ totalOver += over; }
+        });
+
+        // Apply stock credits (delta math handles idempotency)
+        const now = this._applyReceiveTargets(o, item => {
+          const idx = o.items.indexOf(item);
+          return receivedMap[idx] != null ? receivedMap[idx] : item.usedQuantity;
+        });
+
+        let followUp = null;
+        if(missing.length === 0){
+          // Full receipt (or over-receipt) -> done
+          o.status = 'done';
+          o.received_at = now;
+          o.received_by = currentUserId;
+        } else {
+          // Partial -> create follow-up for the shortages
+          o.status = 'partial';
+          o.received_at = now;
+          o.received_by = currentUserId;
+
+          const followUpItems = missing.map(m => ({
+            productId: m.orig.productId,
+            product: { ...m.orig.product },
+            usedQuantity: m.short,
+            receivedQuantity: 0,
+            creditedQty: 0,
+          }));
+          const dateStr = now.slice(0, 10);
+          const timeStr = new Date().toTimeString().slice(0, 5);
+          followUp = {
+            id: uid(),
+            restaurant_id: rid,
+            parent_order_id: o.id,
+            title: 'Συμπληρωματική: ' + (o.title || 'Παραγγελία'),
+            status: 'new',
+            items: followUpItems,
+            ordered_date: dateStr,
+            ordered_time: timeStr,
+            received_at: null,
+            created_by: currentUserId,
+            received_by: null,
+            created_at: now,
+            updated_at: now,
+          };
+          // No stock change for the follow-up at creation — its items already exist in cloud.
+          // The original order's items have negative-deductions (-usedQuantity) that were already
+          // applied when the parent was created; we don't double-deduct.
+          // Wait, that's wrong — we DO need to deduct the follow-up's usedQuantity from stock,
+          // otherwise stock = original-fullOrderedQty+receivedQty +which is the desired state for partial.
+          // Actually let's trace:
+          //   create order(5) → stock -5
+          //   receive 3 → stock +3 (now -2 from start; correct because 2 are missing/in-transit)
+          //   create follow-up(2) → if we DON'T deduct, stock stays at -2. Correct! The follow-up
+          //   represents the 2 still owed. When that follow-up is received, +2 → stock back to 0.
+          // So: NO stock change at follow-up creation. ✓
+          cache.orders.unshift(followUp);
+          enqueue('upsert', 'orders', followUp);
+        }
+        o.updated_at = now;
+        saveCache('orders');
+        enqueue('upsert', 'orders', o);
+
+        return { newStatus: o.status, followUp, totals: { received: totalReceived, short: totalShort, over: totalOver } };
+      },
+
       delete(id){
         const o = (cache.orders || []).find(x => x.id === id);
         if(!o) return;
         const now = new Date().toISOString();
         // Roll back any credits AND restore deducted stock
-        // Net effect: stock should return to "as if order never existed"
-        //   currentStockDelta = -usedQuantity + creditedQty
-        //   on delete, we undo that: +usedQuantity - creditedQty
+        // Net: undo = usedQuantity - creditedQty (gives back what was net-deducted)
         o.items.forEach(item => {
           const undoDelta = (+item.usedQuantity || 0) - (+item.creditedQty || 0);
           if(undoDelta !== 0){
@@ -2348,11 +2492,15 @@ function populateOrdersChips(){
   const counts = {
     all: all.length,
     new: all.filter(o => o.status === 'new').length,
+    pending: all.filter(o => o.status === 'pending').length,
+    partial: all.filter(o => o.status === 'partial').length,
     done: all.filter(o => o.status === 'done').length,
   };
   const opts = [
     { key:'all', label:'Όλες' },
     { key:'new', label:'Νέες' },
+    { key:'pending', label:'Σε εξέλιξη' },
+    { key:'partial', label:'Μερικές' },
     { key:'done', label:'Ολοκληρωμένες' },
   ];
   host.innerHTML = opts.map(o => {
@@ -2390,12 +2538,13 @@ function renderOrders(){
   list.innerHTML = items.map(o => {
     const itemCount = (o.items || []).length;
     const totalQty = (o.items || []).reduce((s, i) => s + (+i.usedQuantity || 0), 0);
-    const statusLabel = ({new:'Νέα', done:'Ολοκληρώθηκε'})[o.status] || o.status;
+    const statusLabel = ({new:'Νέα', pending:'Σε εξέλιξη', done:'Ολοκληρώθηκε', partial:'Μερική'})[o.status] || o.status;
+    const parentHint = o.parent_order_id ? ' · Συμπληρωματική' : '';
     return `<div class="ord-card" data-oid="${esc(o.id)}">
       <span class="ord-status-dot ${o.status}"></span>
       <div class="ord-body">
         <div class="ord-title">${esc(o.title || 'Παραγγελία')}</div>
-        <div class="ord-meta">${formatGreekDate(o.ordered_date)} · ${esc(o.ordered_time || '')}  ·  ${statusLabel}</div>
+        <div class="ord-meta">${formatGreekDate(o.ordered_date)} · ${esc(o.ordered_time || '')}  ·  ${statusLabel}${parentHint}</div>
       </div>
       <div class="ord-stats">
         <span class="pill">${itemCount} γρ.</span>
@@ -2417,26 +2566,36 @@ function openOrderDetail(oid){
   $('odd-title').textContent = o.title || 'Παραγγελία';
   $('odd-sub').textContent = `${formatGreekDate(o.ordered_date)} · ${o.ordered_time || ''} · ${(o.items || []).length} γραμμές`;
 
-  // Status row (minimum viable: only new <-> done)
-  ['new','done'].forEach(s => {
+  // Status row — show partial pill only when active
+  ['new','pending','done','partial'].forEach(s => {
     const btn = $('ss-' + s);
-    if(btn){
-      btn.className = 'status-btn' + (o.status === s ? ' active-' + s : '');
-      btn.onclick = () => {
-        if(o.status === s) return;
-        const action = s === 'done' ? 'Ολοκληρωμένη (παρέλαβα)' : 'Νέα (αναμένει)';
-        const desc = s === 'done'
-          ? 'Επιβεβαιώνεις παραλαβή όλων των προϊόντων; Το stock θα ενημερωθεί.'
-          : 'Να επαναφερθεί η παραγγελία σε «Νέα»; Το stock θα διορθωθεί ανάλογα.';
-        confirmAction('Αλλαγή κατάστασης: ' + action, desc, () => {
-          db.orders.setStatus(o.id, s);
-          renderProducts(); renderOrders(); populateCatChips();
-          openOrderDetail(o.id); // refresh
-          toast('✓ Κατάσταση: ' + action.split(' ')[0], 'ok');
-        });
-      };
-    }
+    if(!btn) return;
+    btn.className = 'status-btn' + (o.status === s ? ' active-' + s : '');
+    // Partial pill is only shown if currently partial (can't be directly chosen)
+    if(s === 'partial') btn.style.display = (o.status === 'partial') ? '' : 'none';
+    btn.onclick = () => {
+      if(o.status === s) return;
+      if(s === 'partial') return; // can't manually set
+      const labels = { new:'Νέα', pending:'Σε εξέλιξη', done:'Ολοκληρωμένη' };
+      let desc;
+      if(s === 'done'){
+        desc = 'Επιβεβαιώνεις παραλαβή όλων των προϊόντων; Το στοκ θα ενημερωθεί.';
+      } else if(o.status === 'done' || o.status === 'partial'){
+        desc = `Να επαναφερθεί η παραγγελία σε «${labels[s]}»; Το στοκ θα διορθωθεί ανάλογα.`;
+      } else {
+        desc = `Αλλαγή κατάστασης σε «${labels[s]}»;`;
+      }
+      confirmAction('Αλλαγή κατάστασης: ' + labels[s], desc, () => {
+        db.orders.setStatus(o.id, s);
+        renderProducts(); renderOrders(); populateCatChips();
+        openOrderDetail(o.id);
+        toast('✓ Κατάσταση: ' + labels[s], 'ok');
+      });
+    };
   });
+
+  // Receive button — opens the per-item receive modal
+  $('btn-receive').onclick = () => openReceiveModal(oid);
 
   // Delete button
   $('odd-del-btn').onclick = () => {
@@ -2467,12 +2626,25 @@ function openOrderDetail(oid){
     const msg = buildOrderMessage(items);
     const msgEnc = encodeURIComponent(msg);
     const waN = waNumber(pv.phone);
-    const itemsHtml = items.map(i => `
-      <div class="ord-prov-item">
+    const showCredit = (o.status === 'done' || o.status === 'partial');
+    const itemsHtml = items.map(i => {
+      const credited = i.creditedQty || 0;
+      const ordered = i.usedQuantity;
+      // Color the credit number: green if exact, blue if over, orange if partial, red if zero
+      let qtyHtml;
+      if(showCredit){
+        const color = credited > ordered ? 'var(--blue)' :
+                      credited === ordered ? 'var(--green)' :
+                      credited > 0 ? '#d97706' : 'var(--red)';
+        qtyHtml = `<span style="color:${color}">${credited}</span><span style="color:var(--muted)">/${ordered}</span>`;
+      } else {
+        qtyHtml = String(ordered);
+      }
+      return `<div class="ord-prov-item">
         <span>${esc(i.product.name)} ${i.product.sku ? '<span style="color:var(--muted);font-size:10px">('+esc(i.product.sku)+')</span>' : ''}</span>
-        <span class="ord-prov-item-q">${i.usedQuantity} ${unitForQty(i.usedQuantity, CATEGORY_UNITS[i.product.category] || 'τεμ')}</span>
-      </div>
-    `).join('');
+        <span class="ord-prov-item-q">${qtyHtml} ${unitForQty(ordered, CATEGORY_UNITS[i.product.category] || 'τεμ')}</span>
+      </div>`;
+    }).join('');
     return `<div class="ord-prov-card">
       <div class="ord-prov-head">
         <div style="flex:1;min-width:0">
@@ -2500,7 +2672,6 @@ function openOrderDetail(oid){
         await navigator.clipboard.writeText(text);
         toast('✓ Αντιγράφηκε', 'ok');
       } catch {
-        // Fallback for browsers without clipboard API
         const ta = document.createElement('textarea');
         ta.value = text;
         ta.style.position = 'fixed';
@@ -2523,6 +2694,165 @@ function closeOrderDetail(){
 }
 
 let currentOpenOrderId = null;
+
+// ─── RECEIVE MODAL (παραλαβή) ────────────────────────────────────────────
+let _recvDraft = {}; // {itemIndex: receivedQty}
+
+function openReceiveModal(orderId){
+  const o = db.orders.get(orderId);
+  if(!o || !o.items || !o.items.length) return;
+
+  // Pre-fill the draft:
+  //  - 'new'/'pending' orders → default to ordered qty (assume full receipt)
+  //  - 'done'/'partial' orders → default to whatever was previously credited
+  _recvDraft = {};
+  const isFresh = (o.status === 'new' || o.status === 'pending');
+  o.items.forEach((it, idx) => {
+    _recvDraft[idx] = isFresh ? it.usedQuantity : (it.creditedQty != null ? it.creditedQty : it.usedQuantity);
+  });
+
+  renderReceiveItems(o);
+  $('recv-modal-msg').innerHTML = '';
+  $('recv-modal').classList.add('show');
+}
+
+function renderReceiveItems(order){
+  // Group by provider
+  const byProv = {};
+  order.items.forEach((it, idx) => {
+    const pn = it.product.provider || 'Χωρίς προμηθευτή';
+    if(!byProv[pn]) byProv[pn] = [];
+    byProv[pn].push({ it, idx });
+  });
+
+  const html = Object.keys(byProv).map(pn => {
+    const rows = byProv[pn].map(({ it, idx }) => {
+      const ordered = it.usedQuantity;
+      const received = _recvDraft[idx] != null ? _recvDraft[idx] : ordered;
+      const isShort = received < ordered;
+      const isFull = received === ordered;
+      const isOver = received > ordered;
+      const stateClass = isShort ? 'short' : (isOver ? 'over' : (isFull ? 'full' : ''));
+      const meta = isShort ? `Λείπουν ${ordered - received}` :
+                   isOver ? `+${received - ordered} πλεόνασμα` :
+                   isFull ? 'Πλήρης' : '';
+      return `<div class="recv-row ${stateClass}">
+        <div>
+          <div class="recv-row-name">${esc(it.product.name)}</div>
+          <div class="recv-row-sku">${esc(it.product.sku || '')} · παραγγέλθηκαν ${ordered}</div>
+        </div>
+        <div class="recv-stepper">
+          <button data-recv-step="${idx}:-1" ${received <= 0 ? 'disabled' : ''}>−</button>
+          <input type="number" min="0" value="${received}" data-recv-input="${idx}" inputmode="numeric"/>
+          <button data-recv-step="${idx}:1">+</button>
+        </div>
+        <div class="recv-row-meta">${meta}</div>
+      </div>`;
+    }).join('');
+    return `<div class="recv-prov"><div class="recv-prov-name">${esc(pn)}</div>${rows}</div>`;
+  }).join('');
+
+  $('recv-content').innerHTML = html;
+
+  // Wire steppers
+  $('recv-content').querySelectorAll('[data-recv-step]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const [idxStr, deltaStr] = btn.dataset.recvStep.split(':');
+      const idx = parseInt(idxStr, 10);
+      const delta = parseInt(deltaStr, 10);
+      // No upper cap (over-receipt allowed); floor at 0
+      _recvDraft[idx] = Math.max(0, (_recvDraft[idx] || 0) + delta);
+      renderReceiveItems(order);
+    });
+  });
+  $('recv-content').querySelectorAll('[data-recv-input]').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const idx = parseInt(inp.dataset.recvInput, 10);
+      let n = parseInt(inp.value, 10);
+      if(isNaN(n) || n < 0) n = 0;
+      _recvDraft[idx] = n;
+      // Update meta inline without full re-render to preserve focus
+      updateReceiveSummary(order);
+    });
+    inp.addEventListener('change', () => renderReceiveItems(order));
+  });
+
+  updateReceiveSummary(order);
+}
+
+function updateReceiveSummary(order){
+  let totalShort = 0, totalOver = 0;
+  order.items.forEach((it, idx) => {
+    const recv = _recvDraft[idx] != null ? _recvDraft[idx] : it.usedQuantity;
+    if(recv < it.usedQuantity) totalShort += (it.usedQuantity - recv);
+    else if(recv > it.usedQuantity) totalOver += (recv - it.usedQuantity);
+  });
+  const btn = $('recv-save-btn');
+  if(!btn) return;
+  if(totalShort === 0 && totalOver === 0){
+    btn.textContent = 'Πλήρης Παραλαβή';
+  } else if(totalShort === 0 && totalOver > 0){
+    btn.textContent = `Παραλαβή (+${totalOver} πλεόνασμα)`;
+  } else if(totalShort > 0 && totalOver === 0){
+    btn.textContent = `Καταχώρηση (Νέα παραγγελία: ${totalShort} τεμ.)`;
+  } else {
+    btn.textContent = `Καταχώρηση (−${totalShort} / +${totalOver})`;
+  }
+}
+
+function confirmReceive(){
+  if(!currentOpenOrderId) return;
+  const o = db.orders.get(currentOpenOrderId);
+  if(!o) return;
+
+  // Compute totals from draft
+  let totalReceived = 0, totalShort = 0, totalOver = 0;
+  o.items.forEach((it, idx) => {
+    const recv = _recvDraft[idx] != null ? _recvDraft[idx] : it.usedQuantity;
+    totalReceived += recv;
+    if(recv < it.usedQuantity) totalShort += (it.usedQuantity - recv);
+    else if(recv > it.usedQuantity) totalOver += (recv - it.usedQuantity);
+  });
+
+  const isFullOrOver = totalShort === 0;
+
+  let title, message, yesLabel;
+  if(isFullOrOver && totalOver === 0){
+    title = 'Πλήρης Παραλαβή';
+    message = `Επιβεβαιώνεις παραλαβή όλων των προϊόντων (${totalReceived} τεμ.); Το στοκ θα ενημερωθεί.`;
+    yesLabel = 'Επιβεβαίωση';
+  } else if(isFullOrOver && totalOver > 0){
+    title = 'Παραλαβή με Πλεόνασμα';
+    message = `Παραλαβή ${totalReceived} τεμ. (${totalOver} πέραν της παραγγελίας). Το στοκ θα ενημερωθεί.`;
+    yesLabel = 'Επιβεβαίωση';
+  } else if(totalReceived === 0){
+    title = 'Μερική Παραλαβή';
+    message = `Δεν παραλήφθηκε κανένα τεμάχιο (λείπουν ${totalShort}). Θα δημιουργηθεί νέα παραγγελία για όλα τα ελλείποντα.`;
+    yesLabel = 'Καταχώρηση';
+  } else {
+    title = 'Μερική Παραλαβή';
+    message = `Παραλαβή: ${totalReceived} τεμ. · Λείπουν: ${totalShort} τεμ.${totalOver ? ' · Πλεόνασμα: ' + totalOver : ''}. Το στοκ θα ενημερωθεί και θα δημιουργηθεί νέα παραγγελία για τα υπόλοιπα.`;
+    yesLabel = 'Καταχώρηση';
+  }
+
+  confirmAction(title, message, () => {
+    const result = db.orders.receive(currentOpenOrderId, _recvDraft);
+    $('recv-modal').classList.remove('show');
+    renderProducts(); renderOrders(); populateCatChips();
+    if(result && result.followUp){
+      // Open the follow-up order so user immediately sees the new one
+      openOrderDetail(result.followUp.id);
+      toast(`Νέα παραγγελία για ${result.totals.short} ελλείποντα`, 'ok');
+    } else {
+      openOrderDetail(currentOpenOrderId);
+      toast(totalOver > 0 ? `✓ Παραλαβή (+${totalOver} πλεόνασμα)` : '✓ Παραγγελία ολοκληρώθηκε', 'ok');
+    }
+  }, yesLabel);
+}
+
+function setupReceiveModal(){
+  $('recv-save-btn').addEventListener('click', confirmReceive);
+}
 
 // Wire close button + backdrop
 function setupOrderDetail(){
