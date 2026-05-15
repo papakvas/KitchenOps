@@ -363,6 +363,79 @@ input::placeholder{color:var(--muted)}
 .ord-prov-actions{display:flex;gap:6px;flex-wrap:wrap}
 .btn-sm{padding:7px 10px;font-size:11px;letter-spacing:1px}
 
+/* ════════════════════════════════════════════════════════════════════════
+   PHASE 2C.3 — Schedule (Gantt-style day view)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Day navigation strip ── */
+.sched-nav{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.sched-nav-btn{flex-shrink:0;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);color:var(--cream2);cursor:pointer}
+.sched-nav-btn:active{background:var(--panel2)}
+.sched-nav-btn svg{width:16px;height:16px;stroke-width:2}
+.sched-day-btn{flex:1;background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:7px 10px;cursor:pointer;text-align:center;display:flex;flex-direction:column;gap:1px;min-width:0}
+.sched-day-btn.current{background:var(--amber-dim);border-color:rgba(232,160,69,.4)}
+.sched-day-btn:active{background:var(--panel2)}
+.sched-day-label{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.3px;color:var(--cream);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sched-day-btn.current .sched-day-label{color:var(--amber)}
+.sched-day-sub{font-family:var(--cond);font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.sched-day-btn.current .sched-day-sub{color:var(--amber);opacity:.7}
+
+/* ── Day stats row ── */
+.sched-stats{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
+.sched-stats::-webkit-scrollbar{display:none}
+.sbox{flex:0 0 auto;border:1.5px solid var(--border2);background:var(--panel);border-radius:var(--rm);padding:8px 12px;min-width:78px}
+.slbl{font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.sval{font-family:var(--hd);font-size:18px;letter-spacing:1px;color:var(--cream);line-height:1}
+.sval.c-amber{color:var(--amber)}
+.sval.c-green{color:var(--green)}
+
+/* ── Toolbar (above Gantt) ── */
+.sched-toolbar{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.sched-tool-spacer{flex:1}
+
+/* ── Gantt container ── */
+.sgantt-wrap{position:relative;border:1.5px solid var(--border);border-radius:var(--rm);background:var(--panel);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.sgantt-wrap::-webkit-scrollbar{height:6px}
+.sgantt-wrap::-webkit-scrollbar-track{background:transparent}
+.sgantt-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── Gantt header row (hour labels) ── */
+.sgantt-hours{position:relative;height:24px;background:var(--dark);border-bottom:1.5px solid var(--border)}
+.sgantt-hour-label{position:absolute;top:0;font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--muted2);transform:translateX(-50%);line-height:24px;pointer-events:none}
+
+/* ── Resource rows ── */
+.sgantt-row{position:relative;height:46px;border-bottom:1.5px solid var(--border)}
+.sgantt-row:last-child{border-bottom:none}
+.sgantt-row-label{position:absolute;left:0;top:0;bottom:0;width:110px;padding:6px 8px;background:var(--panel);border-right:1.5px solid var(--border);z-index:5;display:flex;flex-direction:column;justify-content:center;box-shadow:2px 0 4px rgba(0,0,0,0.3)}
+.sgantt-row-name{font-family:var(--cond);font-size:12px;font-weight:700;color:var(--cream);letter-spacing:.3px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sgantt-row-role{font-family:var(--cond);font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;line-height:1.1;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Gantt grid area ── */
+.sgantt-grid{position:absolute;left:110px;top:0;right:0;bottom:0;cursor:pointer}
+.sgantt-hour-line{position:absolute;top:0;bottom:0;width:1px;background:var(--border);pointer-events:none}
+.sgantt-hour-line.major{background:var(--border2)}
+.sgantt-offhours{position:absolute;top:0;bottom:0;background:rgba(0,0,0,0.25);pointer-events:none}
+
+/* ── Shift pucks ── */
+.sgantt-puck{position:absolute;top:4px;bottom:4px;border-radius:var(--r);padding:4px 6px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;overflow:hidden;font-family:var(--cond);box-shadow:0 1px 3px rgba(0,0,0,0.4);min-width:24px;z-index:2}
+.sgantt-puck:active{transform:scale(.97)}
+.sgantt-puck-time{font-size:10px;font-weight:700;letter-spacing:.3px;color:rgba(255,255,255,0.95);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sgantt-puck-note{font-size:9px;font-weight:600;color:rgba(255,255,255,0.75);margin-top:1px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── Color picker (in resource modal) ── */
+.color-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:6px}
+.color-cell{aspect-ratio:1;border-radius:var(--r);cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.color-cell:active{transform:scale(.9)}
+.color-cell.on{border-color:var(--cream);box-shadow:0 0 0 2px var(--amber)}
+
+/* ── Time picker shortcuts ── */
+.time-presets{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.time-preset{padding:6px 9px;background:var(--dark);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--cream2);font-family:var(--cond);font-size:10px;font-weight:600;cursor:pointer;letter-spacing:.5px}
+.time-preset:active,.time-preset.on{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
+
+/* ── Empty state in resource list ── */
+.sched-empty{padding:36px 18px;text-align:center;font-family:var(--cond);color:var(--muted2)}
+
 /* Empty state for orders */
 /* (re-uses .empty class)*/
 </style>
@@ -381,8 +454,8 @@ input::placeholder{color:var(--muted)}
     <h1>⚠️ CONFIG MISSING</h1>
     <p>Πριν χρησιμοποιήσεις την εφαρμογή, πρέπει να συμπληρώσεις τα δικά σου Supabase credentials στην αρχή του αρχείου HTML.</p>
     <p>Άνοιξε το αρχείο με έναν text editor και βρες αυτές τις γραμμές:</p>
-    <code>const SUPABASE_URL = 'https://ybpvjnkmubowqukjtjgh.supabase.co';</code>
-    <code>const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicHZqbmttdWJvd3F1a2p0amdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDM2MjMsImV4cCI6MjA5NDA3OTYyM30.ZMeBlokB5k6Eg4g-NwvlVGKsjX0w6lvXf0ErFT9fQq0';</code>
+    <code>const SUPABASE_URL = '...';</code>
+    <code>const SUPABASE_ANON_KEY = '...';</code>
     <p>Αντικατάστησε τις τιμές με αυτές από το Supabase Dashboard → Settings → API.</p>
   </div>
 </div>
@@ -481,21 +554,20 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">📋 Phase 2C.2b — Πλήρες Μοντέλο Παραγγελιών</div>
+      <div class="info-card-title" style="color:var(--amber)">📅 Phase 2C.3 — Πρόγραμμα Cloud</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
-        Όλες οι καταστάσεις: Νέα / Σε εξέλιξη / Ολοκληρωμένη / Μερική. 
-        Μερική παραλαβή με αυτόματη συμπληρωματική παραγγελία για ελλείποντα. 
-        Υποστήριξη πλεονάσματος (over-receipt). WhatsApp + email + αντιγραφή για κάθε προμηθευτή.
+        Όλες οι λειτουργίες του Phase 1 πλέον στο cloud. Διαχείριση πόρων (μάγειρες, σερβιτόροι κλπ.) και βάρδιες ανά ημέρα. Τα δεδομένα συγχρονίζονται μεταξύ συσκευών.
       </p>
     </div>
 
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
       <button class="btn btn-ghost" id="btn-import" style="flex:1;min-width:160px">📂 Εισαγωγή από JSON</button>
+      <button class="btn btn-ghost" id="btn-go-categories" style="flex:1;min-width:140px">🗂 Κατηγορίες</button>
       <button class="btn btn-ghost" id="btn-logout" style="flex:1;min-width:140px">Αποσύνδεση</button>
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2C.2b<br/>
+      KitchenOPS Cloud · Phase 2C.3<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -547,6 +619,30 @@ input::placeholder{color:var(--muted)}
     <div id="categories-list"></div>
   </main>
 
+  <!-- SCHEDULE page (Πρόγραμμα) -->
+  <main class="page has-tabbar hidden" id="page-schedule">
+    <div class="page-title">Πρόγραμμα</div>
+    <div class="page-sub">Βάρδιες ανά πόρο και ημέρα</div>
+    <div class="sched-nav">
+      <button class="sched-nav-btn" data-sched-nav="prev" title="Προηγούμενη ημέρα">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="sched-day-btn" id="sched-day-btn" data-sched-nav="today">
+        <div class="sched-day-label" id="sched-day-label">—</div>
+        <div class="sched-day-sub" id="sched-day-sub">—</div>
+      </button>
+      <button class="sched-nav-btn" data-sched-nav="next" title="Επόμενη ημέρα">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="sched-stats" id="sched-stats"></div>
+    <div class="sched-toolbar">
+      <button class="btn btn-ghost btn-sm" id="btn-add-resource">👤 Νέος Πόρος</button>
+      <div class="sched-tool-spacer"></div>
+    </div>
+    <div id="sched-content"></div>
+  </main>
+
   <!-- FAB (changes per page) -->
   <button class="fab hidden" id="fab" title="Προσθήκη">+</button>
 
@@ -579,9 +675,9 @@ input::placeholder{color:var(--muted)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Προμηθ.</span>
     </button>
-    <button class="tabbar-btn" data-tab="categories" title="Κατηγορίες">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Κατηγ.</span>
+    <button class="tabbar-btn" data-tab="schedule" title="Πρόγραμμα">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Πρόγρ.</span>
     </button>
   </nav>
 </div>
@@ -630,6 +726,80 @@ input::placeholder{color:var(--muted)}
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="recv-modal" style="flex:1">Άκυρο</button>
       <button class="btn btn-amber" id="recv-save-btn" style="flex:2">Πλήρης Παραλαβή</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── RESOURCE MODAL (Πόρος) ─── -->
+<div class="modal-ov" id="res-modal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <span class="modal-title" id="res-modal-title">Νέος Πόρος</span>
+      <button class="modal-close" data-close="res-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label class="fl">Όνομα *</label>
+        <input type="text" id="res-name" placeholder="π.χ. Νίκος Π." autocomplete="off"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Ρόλος / Θέση</label>
+        <input type="text" id="res-role" placeholder="π.χ. ΑΡΧΙΜΑΓΕΙΡΑΣ" autocomplete="off"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Χρώμα</label>
+        <div class="color-grid" id="res-color-grid"></div>
+      </div>
+      <div id="res-modal-msg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="res-modal" style="flex:1">Άκυρο</button>
+      <button class="btn btn-amber" id="res-save" style="flex:2">Αποθήκευση</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SHIFT MODAL (Βάρδια) ─── -->
+<div class="modal-ov" id="shift-modal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <span class="modal-title" id="shift-modal-title">Νέα Βάρδια</span>
+      <button class="modal-close" data-close="shift-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-card" id="shift-modal-info" style="margin-bottom:14px;padding:10px 12px">
+        <div class="info-card-row" style="padding:2px 0;border:none">
+          <span class="lbl">Πόρος</span><span class="val" id="shift-modal-resource">—</span>
+        </div>
+        <div class="info-card-row" style="padding:2px 0;border:none">
+          <span class="lbl">Ημέρα</span><span class="val" id="shift-modal-date">—</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Έναρξη (ώρα)</label>
+        <input type="number" id="shift-start" min="0" max="23.75" step="0.25" value="9" inputmode="decimal"/>
+        <div class="time-presets" id="shift-start-presets"></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Διάρκεια (ώρες)</label>
+        <input type="number" id="shift-duration" min="0.25" max="24" step="0.25" value="8" inputmode="decimal"/>
+        <div class="time-presets">
+          <button class="time-preset" data-dur="4">4 ώρες</button>
+          <button class="time-preset" data-dur="6">6 ώρες</button>
+          <button class="time-preset" data-dur="8">8 ώρες</button>
+          <button class="time-preset" data-dur="10">10 ώρες</button>
+          <button class="time-preset" data-dur="12">12 ώρες</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Σημείωση</label>
+        <input type="text" id="shift-note" placeholder="προαιρετικό"/>
+      </div>
+      <div id="shift-modal-msg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="shift-modal" style="flex:1">Άκυρο</button>
+      <button class="btn btn-amber" id="shift-save" style="flex:2">Αποθήκευση</button>
     </div>
   </div>
 </div>
@@ -1079,12 +1249,15 @@ async function loadDashboard(){
       setupChecklist();
       setupOrderDetail();
       setupReceiveModal();
+      setupSchedule();
+      $('btn-go-categories').addEventListener('click', () => switchTab('categories'));
       window._kc_ui_inited = true;
     }
     renderProducts(); renderProviders(); renderCategories();
     populateCatChips();
     if(typeof renderOrders === 'function'){ renderOrders(); populateOrdersChips(); }
     if(typeof renderChecklist === 'function'){ renderChecklist(); populateCheckCatChips(); }
+    if(typeof renderSchedule === 'function') renderSchedule();
     db.sync.flush(); // try to flush any pending writes from offline
   }
 }
@@ -1153,7 +1326,7 @@ function confirmAction(title, message, onYes, yesLabel='Ναι'){
 // ════════════════════════════════════════════════════════════════════════
 const db = (() => {
   let rid = null;
-  let cache = { products: [], providers: [], categories: [], orders: [] };
+  let cache = { products: [], providers: [], categories: [], orders: [], resources: [], shifts: [] };
   let queue = []; // [{id, op:'upsert'|'delete', table, payload, seq, retries, lastErr}]
   let queueSeq = 0;
   let flushing = false;
@@ -1166,6 +1339,8 @@ const db = (() => {
       provs: `kc:${rid}:providers`,
       cats: `kc:${rid}:categories`,
       orders: `kc:${rid}:orders`,
+      resources: `kc:${rid}:resources`,
+      shifts: `kc:${rid}:shifts`,
       queue: `kc:${rid}:queue`,
       seq: `kc:${rid}:seq`,
       meta: `kc:${rid}:meta`,
@@ -1178,6 +1353,8 @@ const db = (() => {
     try { cache.providers = JSON.parse(localStorage.getItem(k.provs) || '[]'); } catch { cache.providers = []; }
     try { cache.categories = JSON.parse(localStorage.getItem(k.cats) || '[]'); } catch { cache.categories = []; }
     try { cache.orders = JSON.parse(localStorage.getItem(k.orders) || '[]'); } catch { cache.orders = []; }
+    try { cache.resources = JSON.parse(localStorage.getItem(k.resources) || '[]'); } catch { cache.resources = []; }
+    try { cache.shifts = JSON.parse(localStorage.getItem(k.shifts) || '[]'); } catch { cache.shifts = []; }
     try { queue = JSON.parse(localStorage.getItem(k.queue) || '[]'); } catch { queue = []; }
     try { queueSeq = parseInt(localStorage.getItem(k.seq) || '0', 10) || 0; } catch { queueSeq = 0; }
   }
@@ -1188,6 +1365,8 @@ const db = (() => {
     if(!part || part==='providers') localStorage.setItem(k.provs, JSON.stringify(cache.providers));
     if(!part || part==='categories') localStorage.setItem(k.cats, JSON.stringify(cache.categories));
     if(!part || part==='orders') localStorage.setItem(k.orders, JSON.stringify(cache.orders || []));
+    if(!part || part==='resources') localStorage.setItem(k.resources, JSON.stringify(cache.resources || []));
+    if(!part || part==='shifts') localStorage.setItem(k.shifts, JSON.stringify(cache.shifts || []));
   }
   function saveQueue(){
     const k = keys();
@@ -1271,16 +1450,16 @@ const db = (() => {
   async function pullAll(){
     if(!onlineNow) return;
     try {
-      const [cats, provs, prods, ords] = await Promise.all([
+      const [cats, provs, prods, ords, res, shf] = await Promise.all([
         sb.from('categories').select('*').eq('restaurant_id', rid).order('sort_order'),
         sb.from('providers').select('*').eq('restaurant_id', rid).order('name'),
         sb.from('products').select('*').eq('restaurant_id', rid).order('name'),
         sb.from('orders').select('*').eq('restaurant_id', rid).order('created_at', { ascending: false }),
+        sb.from('resources').select('*').eq('restaurant_id', rid).order('sort_order'),
+        sb.from('schedule_shifts').select('*').eq('restaurant_id', rid).order('shift_date', { ascending: false }),
       ]);
-      if(cats.error || provs.error || prods.error || ords.error) throw (cats.error || provs.error || prods.error || ords.error);
+      if(cats.error || provs.error || prods.error || ords.error || res.error || shf.error) throw (cats.error || provs.error || prods.error || ords.error || res.error || shf.error);
 
-      // Merge with cache: server is authoritative for already-synced rows;
-      // but locally-pending rows in queue stay until they sync.
       const pendingIds = new Set(queue.filter(q => q.op==='upsert').map(q => q.payload.id));
 
       cache.categories = (cats.data || []).filter(r => !pendingIds.has(r.id))
@@ -1291,12 +1470,17 @@ const db = (() => {
         .concat(cache.products.filter(r => pendingIds.has(r.id)));
       cache.orders = (ords.data || []).filter(r => !pendingIds.has(r.id))
         .concat((cache.orders || []).filter(r => pendingIds.has(r.id)));
+      cache.resources = (res.data || []).filter(r => !pendingIds.has(r.id))
+        .concat((cache.resources || []).filter(r => pendingIds.has(r.id)));
+      cache.shifts = (shf.data || []).filter(r => !pendingIds.has(r.id))
+        .concat((cache.shifts || []).filter(r => pendingIds.has(r.id)));
 
       saveCache();
       renderProducts(); renderProviders(); renderCategories();
       populateCatChips();
       if(typeof renderOrders === 'function') renderOrders();
       if(typeof renderChecklist === 'function') renderChecklist();
+      if(typeof renderSchedule === 'function') renderSchedule();
     } catch(err){
       console.warn('pullAll failed (will use cache):', err);
     }
@@ -1307,7 +1491,7 @@ const db = (() => {
     async init(restaurantId){
       // Reset in-memory state in case re-initing with a different restaurant
       rid = restaurantId;
-      cache = { products: [], providers: [], categories: [], orders: [] };
+      cache = { products: [], providers: [], categories: [], orders: [], resources: [], shifts: [] };
       queue = [];
       queueSeq = 0;
       flushing = false;
@@ -1475,6 +1659,76 @@ const db = (() => {
         p.updated_at = new Date().toISOString();
         saveCache('products');
         enqueue('upsert', 'products', p);
+      },
+    },
+
+    resources: {
+      list: () => cache.resources ? cache.resources.slice().sort((a,b) => (a.sort_order||0) - (b.sort_order||0)) : [],
+      get: (id) => (cache.resources || []).find(r => r.id === id),
+      upsert(r){
+        const now = new Date().toISOString();
+        const existing = r.id ? (cache.resources || []).find(x => x.id === r.id) : null;
+        const row = {
+          id: r.id || uid(),
+          restaurant_id: rid,
+          name: r.name,
+          role: r.role || null,
+          color: r.color || '#e8a045',
+          sort_order: r.sort_order != null ? r.sort_order : (existing ? existing.sort_order : (cache.resources || []).length),
+          created_at: existing ? existing.created_at : now,
+        };
+        cache.resources = cache.resources || [];
+        const idx = cache.resources.findIndex(x => x.id === row.id);
+        if(idx >= 0) cache.resources[idx] = row;
+        else cache.resources.push(row);
+        saveCache('resources');
+        enqueue('upsert', 'resources', row);
+        return row;
+      },
+      delete(id){
+        // Schedule shifts for this resource cascade via DB; clean up cache too
+        cache.shifts = (cache.shifts || []).filter(s => s.resource_id !== id);
+        cache.resources = (cache.resources || []).filter(r => r.id !== id);
+        saveCache('resources');
+        saveCache('shifts');
+        enqueue('delete', 'resources', { id });
+      },
+    },
+
+    shifts: {
+      // List all shifts; usually filtered by date externally
+      list: () => cache.shifts ? cache.shifts.slice() : [],
+      // Shifts for a specific date (YYYY-MM-DD)
+      forDate(dateStr){
+        return (cache.shifts || []).filter(s => s.shift_date === dateStr);
+      },
+      get: (id) => (cache.shifts || []).find(s => s.id === id),
+      upsert(s){
+        const now = new Date().toISOString();
+        const existing = s.id ? (cache.shifts || []).find(x => x.id === s.id) : null;
+        const row = {
+          id: s.id || uid(),
+          restaurant_id: rid,
+          resource_id: s.resource_id,
+          shift_date: s.shift_date,
+          start_hour: +s.start_hour,
+          duration: +s.duration,
+          note: s.note || null,
+          created_at: existing ? existing.created_at : now,
+          updated_at: now,
+        };
+        cache.shifts = cache.shifts || [];
+        const idx = cache.shifts.findIndex(x => x.id === row.id);
+        if(idx >= 0) cache.shifts[idx] = row;
+        else cache.shifts.push(row);
+        saveCache('shifts');
+        enqueue('upsert', 'schedule_shifts', row);
+        return row;
+      },
+      delete(id){
+        cache.shifts = (cache.shifts || []).filter(s => s.id !== id);
+        saveCache('shifts');
+        enqueue('delete', 'schedule_shifts', { id });
       },
     },
 
@@ -2874,7 +3128,7 @@ switchTab = function(t){
   }
   currentTab = t;
   document.querySelectorAll('.tabbar-btn').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  ['home','checklist','products','orders','providers','categories'].forEach(name => {
+  ['home','checklist','products','orders','providers','categories','schedule'].forEach(name => {
     const el = $('page-' + name);
     if(el) el.classList.toggle('hidden', name !== t);
   });
@@ -2899,6 +3153,378 @@ document.head.appendChild(_styleAB);
 
 // ════════════════════════════════════════════════════════════════════════
 // END PHASE 2C.2
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// PHASE 2C.3 — Schedule (Gantt-style day view)
+// ════════════════════════════════════════════════════════════════════════
+
+// ─── Constants & helpers ────────────────────────────────────────────────
+const COLOR_PALETTE = [
+  '#e8a045','#f0b865','#c47a3a','#d97706',  // ambers
+  '#5b8dee','#3b6fc6','#6aab78','#4e8a5c',  // blues + greens
+  '#9b59b6','#7e3f96','#e05c4a','#b54637',  // purples + reds
+  '#5d6b75','#8a7f70','#3aa0a0','#6e8c8b',  // neutrals + teal
+];
+const DAY_NAMES_GR = ['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'];
+const MONTH_NAMES_GR_FULL = ['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
+
+// Local-date helpers — never use UTC; pick the user's local YYYY-MM-DD
+function localISODate(d){
+  d = d || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function parseLocalDate(s){
+  // Parse "YYYY-MM-DD" as a local date (not UTC)
+  if(!s) return new Date();
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function isToday(d){
+  return localISODate(d) === localISODate(new Date());
+}
+function fmtHourLabel(h){
+  // h might be fractional (e.g. 9.5 for 9:30)
+  const hh = Math.floor(h);
+  const mm = Math.round((h - hh) * 60);
+  return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+}
+
+// ─── Schedule state ─────────────────────────────────────────────────────
+let schedCurrentDate = new Date(); // selected date
+let editingResId = null;
+let editingShiftId = null;
+let resModalColor = COLOR_PALETTE[0];
+let shiftModalContext = null; // {resourceId, dateStr, prefillStart?}
+
+// ─── Render the schedule page ───────────────────────────────────────────
+function renderSchedule(){
+  if($('page-schedule').classList.contains('hidden')) return; // optimization
+  renderSchedNav();
+  renderSchedStats();
+  renderSchedGantt();
+}
+
+function renderSchedNav(){
+  const d = schedCurrentDate;
+  const dayName = DAY_NAMES_GR[d.getDay()];
+  const dateLabel = `${d.getDate()} ${MONTH_NAMES_GR_FULL[d.getMonth()]} ${d.getFullYear()}`;
+  $('sched-day-label').textContent = `${dayName}, ${d.getDate()} ${MONTH_NAMES_GR_FULL[d.getMonth()].slice(0,3)} ${d.getFullYear()}`;
+  $('sched-day-sub').textContent = isToday(d) ? 'Σήμερα' : 'Πατήστε για σήμερα';
+  $('sched-day-btn').classList.toggle('current', isToday(d));
+}
+
+function renderSchedStats(){
+  const dateStr = localISODate(schedCurrentDate);
+  const dayShifts = db.shifts.forDate(dateStr);
+  const resources = db.resources.list();
+  const busyResIds = new Set(dayShifts.map(s => s.resource_id));
+  let totalHours = 0;
+  dayShifts.forEach(s => { totalHours += +s.duration || 0; });
+  $('sched-stats').innerHTML = `
+    <div class="sbox"><div class="slbl">Πόροι</div><div class="sval c-amber">${busyResIds.size}/${resources.length}</div></div>
+    <div class="sbox"><div class="slbl">Βάρδιες</div><div class="sval">${dayShifts.length}</div></div>
+    <div class="sbox"><div class="slbl">Ώρες</div><div class="sval c-green">${totalHours}</div></div>
+  `;
+}
+
+function renderSchedGantt(){
+  const host = $('sched-content');
+  const resources = db.resources.list();
+
+  if(resources.length === 0){
+    host.innerHTML = `<div class="empty">
+      <div class="empty-icon">👥</div>
+      <div class="empty-title">Δεν έχεις πόρους ακόμα</div>
+      <div class="empty-sub">Πάτησε «Νέος Πόρος» παραπάνω για να ξεκινήσεις (π.χ. μάγειρες, σερβιτόροι)</div>
+    </div>`;
+    return;
+  }
+
+  const dateStr = localISODate(schedCurrentDate);
+  const dayShifts = db.shifts.forDate(dateStr);
+
+  // Sizing — fixed 60px per hour. Total width = 24 * 60 = 1440px (scrolls horizontally)
+  const HOUR_PX = 60;
+  const HOURS = 24;
+  const GRID_WIDTH = HOURS * HOUR_PX;
+  const RESOURCE_COL_W = 110; // matches CSS
+
+  // Build hour labels (every 2 hours to avoid clutter)
+  const hourLabels = [];
+  for(let h = 0; h <= 24; h += 2){
+    hourLabels.push(`<div class="sgantt-hour-label" style="left:${h * HOUR_PX}px">${String(h).padStart(2,'0')}:00</div>`);
+  }
+
+  // Build resource rows
+  const rowsHtml = resources.map(r => {
+    const shifts = dayShifts.filter(s => s.resource_id === r.id);
+
+    // Hour gridlines (per-row to be aligned)
+    const lines = [];
+    for(let h = 1; h < 24; h++){
+      const major = h % 2 === 0;
+      lines.push(`<div class="sgantt-hour-line ${major?'major':''}" style="left:${h * HOUR_PX}px"></div>`);
+    }
+    // Off-hours shading (0-6, 22-24)
+    const offHours = `
+      <div class="sgantt-offhours" style="left:0;width:${6 * HOUR_PX}px"></div>
+      <div class="sgantt-offhours" style="left:${22 * HOUR_PX}px;width:${2 * HOUR_PX}px"></div>
+    `;
+    // Shift pucks
+    const puckHtml = shifts.map(s => {
+      const left = (+s.start_hour || 0) * HOUR_PX;
+      const width = Math.max(24, (+s.duration || 1) * HOUR_PX - 2);
+      const end = (+s.start_hour || 0) + (+s.duration || 0);
+      const timeLabel = `${fmtHourLabel(s.start_hour)}-${fmtHourLabel(end)}`;
+      return `<div class="sgantt-puck" data-shift-id="${esc(s.id)}" style="left:${left}px;width:${width}px;background:${esc(r.color)}">
+        <div class="sgantt-puck-time">${timeLabel}</div>
+        ${s.note ? `<div class="sgantt-puck-note">${esc(s.note)}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    return `<div class="sgantt-row" data-res-id="${esc(r.id)}">
+      <div class="sgantt-row-label" data-res-edit="${esc(r.id)}">
+        <div class="sgantt-row-name">${esc(r.name)}</div>
+        ${r.role ? `<div class="sgantt-row-role">${esc(r.role)}</div>` : ''}
+      </div>
+      <div class="sgantt-grid" data-grid-res="${esc(r.id)}" style="left:${RESOURCE_COL_W}px;width:${GRID_WIDTH}px">
+        ${offHours}
+        ${lines.join('')}
+        ${puckHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  const totalWidth = RESOURCE_COL_W + GRID_WIDTH;
+  host.innerHTML = `<div class="sgantt-wrap">
+    <div style="min-width:${totalWidth}px">
+      <div class="sgantt-hours" style="margin-left:${RESOURCE_COL_W}px;width:${GRID_WIDTH}px;position:relative">
+        ${hourLabels.join('')}
+      </div>
+      ${rowsHtml}
+    </div>
+  </div>`;
+
+  // Wire interactions
+  host.querySelectorAll('[data-res-edit]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openResourceModal(el.dataset.resEdit);
+    });
+  });
+  host.querySelectorAll('[data-shift-id]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openShiftModal(null, null, el.dataset.shiftId);
+    });
+  });
+  host.querySelectorAll('[data-grid-res]').forEach(grid => {
+    grid.addEventListener('click', (e) => {
+      // Don't trigger if user tapped a puck
+      if(e.target.closest('[data-shift-id]')) return;
+      const rect = grid.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      // Round to quarter-hour
+      const hour = Math.max(0, Math.min(23.75, Math.round((x / HOUR_PX) * 4) / 4));
+      openShiftModal(grid.dataset.gridRes, dateStr, null, hour);
+    });
+  });
+}
+
+// ─── Day navigation ─────────────────────────────────────────────────────
+function setupScheduleNav(){
+  document.querySelectorAll('[data-sched-nav]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.schedNav;
+      if(action === 'prev'){
+        schedCurrentDate = new Date(schedCurrentDate.getTime() - 86400000);
+      } else if(action === 'next'){
+        schedCurrentDate = new Date(schedCurrentDate.getTime() + 86400000);
+      } else if(action === 'today'){
+        schedCurrentDate = new Date();
+      }
+      renderSchedule();
+    });
+  });
+  $('btn-add-resource').addEventListener('click', () => openResourceModal(null));
+}
+
+// ─── Resource modal ─────────────────────────────────────────────────────
+function openResourceModal(id){
+  editingResId = id;
+  const r = id ? db.resources.get(id) : null;
+  $('res-modal-title').textContent = r ? 'Επεξεργασία Πόρου' : 'Νέος Πόρος';
+  $('res-name').value = r ? r.name : '';
+  $('res-role').value = r ? (r.role || '') : '';
+  resModalColor = r ? r.color : COLOR_PALETTE[0];
+  $('res-modal-msg').innerHTML = '';
+
+  // Build color grid
+  $('res-color-grid').innerHTML = COLOR_PALETTE.map(c =>
+    `<button class="color-cell ${c===resModalColor?'on':''}" data-color="${esc(c)}" style="background:${esc(c)}"></button>`).join('');
+  $('res-color-grid').querySelectorAll('[data-color]').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      resModalColor = b.dataset.color;
+      $('res-color-grid').querySelectorAll('.color-cell').forEach(c => c.classList.toggle('on', c === b));
+    });
+  });
+
+  // Delete button if editing
+  const foot = document.querySelector('#res-modal .modal-foot');
+  foot.querySelectorAll('[data-res-delete]').forEach(b => b.remove());
+  if(r){
+    const del = document.createElement('button');
+    del.className = 'btn btn-ghost';
+    del.style.cssText = 'flex:1;color:var(--red);border-color:rgba(224,92,74,.4)';
+    del.dataset.resDelete = '1';
+    del.textContent = '🗑';
+    del.addEventListener('click', () => {
+      const shiftCount = db.shifts.list().filter(s => s.resource_id === r.id).length;
+      const warn = shiftCount > 0 ? ` Θα διαγραφούν και ${shiftCount} βάρδιες του.` : '';
+      confirmAction('Διαγραφή Πόρου', `Διαγραφή «${r.name}»;${warn}`, () => {
+        db.resources.delete(r.id);
+        $('res-modal').classList.remove('show');
+        renderSchedule();
+        toast('Διαγράφηκε', 'ok');
+      }, 'Διαγραφή');
+    });
+    foot.insertBefore(del, foot.firstChild);
+  }
+
+  $('res-modal').classList.add('show');
+  setTimeout(() => $('res-name').focus(), 100);
+}
+
+function saveResourceFromModal(){
+  const name = $('res-name').value.trim();
+  const role = $('res-role').value.trim();
+  const msgEl = $('res-modal-msg');
+  if(!name){ msg(msgEl, 'err', 'Όνομα υποχρεωτικό.'); $('res-name').focus(); return; }
+  db.resources.upsert({
+    id: editingResId,
+    name, role,
+    color: resModalColor,
+  });
+  $('res-modal').classList.remove('show');
+  renderSchedule();
+  toast(editingResId ? 'Ενημερώθηκε' : 'Προστέθηκε', 'ok');
+}
+
+// ─── Shift modal ────────────────────────────────────────────────────────
+function openShiftModal(resourceId, dateStr, shiftId, prefillStart){
+  editingShiftId = shiftId || null;
+  const s = shiftId ? db.shifts.get(shiftId) : null;
+
+  // Resolve context
+  const resId = s ? s.resource_id : resourceId;
+  const date = s ? s.shift_date : (dateStr || localISODate(schedCurrentDate));
+  shiftModalContext = { resourceId: resId, dateStr: date };
+
+  const res = db.resources.get(resId);
+  if(!res){ toast('Πόρος δεν βρέθηκε', 'err'); return; }
+
+  $('shift-modal-title').textContent = s ? 'Επεξεργασία Βάρδιας' : 'Νέα Βάρδια';
+  $('shift-modal-resource').textContent = res.name;
+  const d = parseLocalDate(date);
+  $('shift-modal-date').textContent = `${DAY_NAMES_GR[d.getDay()]}, ${d.getDate()} ${MONTH_NAMES_GR_FULL[d.getMonth()]}`;
+
+  $('shift-start').value = s ? s.start_hour : (prefillStart != null ? prefillStart : 9);
+  $('shift-duration').value = s ? s.duration : 8;
+  $('shift-note').value = s ? (s.note || '') : '';
+  $('shift-modal-msg').innerHTML = '';
+
+  // Start hour presets
+  const startPresets = [
+    {label:'06:00', v:6}, {label:'08:00', v:8}, {label:'10:00', v:10},
+    {label:'12:00', v:12}, {label:'14:00', v:14}, {label:'16:00', v:16},
+    {label:'18:00', v:18}, {label:'20:00', v:20},
+  ];
+  $('shift-start-presets').innerHTML = startPresets.map(p =>
+    `<button class="time-preset" data-start="${p.v}">${p.label}</button>`).join('');
+  $('shift-start-presets').querySelectorAll('[data-start]').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      $('shift-start').value = b.dataset.start;
+    });
+  });
+
+  // Duration presets
+  document.querySelectorAll('#shift-modal [data-dur]').forEach(b => {
+    b.onclick = (e) => {
+      e.preventDefault();
+      $('shift-duration').value = b.dataset.dur;
+    };
+  });
+
+  // Delete button if editing
+  const foot = document.querySelector('#shift-modal .modal-foot');
+  foot.querySelectorAll('[data-shift-delete]').forEach(b => b.remove());
+  if(s){
+    const del = document.createElement('button');
+    del.className = 'btn btn-ghost';
+    del.style.cssText = 'flex:1;color:var(--red);border-color:rgba(224,92,74,.4)';
+    del.dataset.shiftDelete = '1';
+    del.textContent = '🗑';
+    del.addEventListener('click', () => {
+      confirmAction('Διαγραφή Βάρδιας', `Διαγραφή της βάρδιας ${fmtHourLabel(s.start_hour)}-${fmtHourLabel(s.start_hour + s.duration)};`, () => {
+        db.shifts.delete(s.id);
+        $('shift-modal').classList.remove('show');
+        renderSchedule();
+        toast('Διαγράφηκε', 'ok');
+      }, 'Διαγραφή');
+    });
+    foot.insertBefore(del, foot.firstChild);
+  }
+
+  $('shift-modal').classList.add('show');
+}
+
+function saveShiftFromModal(){
+  const msgEl = $('shift-modal-msg');
+  const start = parseFloat($('shift-start').value);
+  const duration = parseFloat($('shift-duration').value);
+  if(isNaN(start) || start < 0 || start >= 24){
+    msg(msgEl, 'err', 'Η ώρα έναρξης πρέπει να είναι 0-23.75.'); return;
+  }
+  if(isNaN(duration) || duration <= 0 || duration > 24){
+    msg(msgEl, 'err', 'Η διάρκεια πρέπει να είναι 0.25-24 ώρες.'); return;
+  }
+  if(!shiftModalContext){ msg(msgEl, 'err', 'Σφάλμα: λείπει πλαίσιο.'); return; }
+
+  db.shifts.upsert({
+    id: editingShiftId,
+    resource_id: shiftModalContext.resourceId,
+    shift_date: shiftModalContext.dateStr,
+    start_hour: start,
+    duration: duration,
+    note: $('shift-note').value.trim(),
+  });
+  $('shift-modal').classList.remove('show');
+  renderSchedule();
+  toast(editingShiftId ? 'Ενημερώθηκε' : 'Προστέθηκε', 'ok');
+}
+
+// ─── Wire up ────────────────────────────────────────────────────────────
+function setupSchedule(){
+  setupScheduleNav();
+  $('res-save').addEventListener('click', saveResourceFromModal);
+  $('shift-save').addEventListener('click', saveShiftFromModal);
+}
+
+// ─── Hook: re-render schedule when tab opens, plus add categories button ─
+const _prevSwitchTab2 = switchTab;
+switchTab = function(t){
+  _prevSwitchTab2(t);
+  if(t === 'schedule') renderSchedule();
+};
+
+// ════════════════════════════════════════════════════════════════════════
+// END PHASE 2C.3
 // ════════════════════════════════════════════════════════════════════════
 
 // ─── INITIAL BOOT: check existing session ────────────────────────────────
