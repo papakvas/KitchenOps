@@ -486,6 +486,16 @@ input::placeholder{color:var(--muted)}
 .rpick-role{font-family:var(--cond);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600}
 .rpick-check{color:var(--amber);font-size:14px;line-height:1}
 
+/* ── Interactive invite card (home page banner) ── */
+.invite-card{background:rgba(91,141,238,.1);border:1.5px solid rgba(91,141,238,.4);border-radius:var(--rm);padding:12px;margin-bottom:10px}
+.invite-card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.invite-card-icon{font-size:20px;line-height:1;flex-shrink:0}
+.invite-card-text{flex:1;min-width:0}
+.invite-card-title{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.3px;color:var(--cream);line-height:1.2}
+.invite-card-sub{font-family:var(--cond);font-size:11px;font-weight:500;color:var(--cream2);letter-spacing:.2px;margin-top:3px;line-height:1.35}
+.invite-card-sub b{color:var(--blue);font-weight:700}
+.invite-card-actions{display:flex;gap:8px}
+
 /* Empty state for orders */
 /* (re-uses .empty class)*/
 </style>
@@ -611,10 +621,10 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D.1 — Διαχείριση Ομάδας</div>
+      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D.1b — Προσκλήσεις Ομάδας</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
         Νέο: Προσκάλεσε μέλη στην ομάδα σου με email. Όταν εγγραφούν με αυτό το email, θα γίνουν αυτόματα μέλη. Διαχείριση μελών και εκκρεμών προσκλήσεων.
-        Στο 2D.2: δυναμικά δικαιώματα ανά λειτουργία.
+        Αποδοχή ή απόρριψη προσκλήσεων μέσα από την εφαρμογή. Στο 2D.2: δυναμικά δικαιώματα.
       </p>
     </div>
 
@@ -626,7 +636,7 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2D.1<br/>
+      KitchenOPS Cloud · Phase 2D.1b<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -1906,17 +1916,13 @@ const db = (() => {
       },
 
       // Fetch pending invitations addressed to the current user's email,
-      // across ALL restaurants. Used to show "you have a pending invite" UI.
+      // across ALL restaurants. Used to show the in-app accept banner.
+      // Uses the my_pending_invitations() SQL function which also returns
+      // the restaurant name (the invitee can't read restaurants directly).
       async listMyPendingInvites(){
         if(!onlineNow) return [];
-        if(!currentUserEmail) return [];
-        const { data, error } = await sb
-          .from('invitations')
-          .select('id, restaurant_id, email, role, expires_at, created_at')
-          .ilike('email', currentUserEmail)
-          .is('accepted_at', null)
-          .gt('expires_at', new Date().toISOString());
-        if(error){ console.warn(error); return []; }
+        const { data, error } = await sb.rpc('my_pending_invitations');
+        if(error){ console.warn('my_pending_invitations failed:', error); return []; }
         return data || [];
       },
 
@@ -1984,6 +1990,23 @@ const db = (() => {
           .delete()
           .eq('user_id', currentUserId)
           .eq('restaurant_id', rid);
+        if(error) throw error;
+      },
+
+      // Accept an invitation addressed to the current user.
+      // Calls the accept_invitation() SQL function (SECURITY DEFINER).
+      // Returns the restaurant_id the user joined.
+      async acceptInvitation(inviteId){
+        if(!onlineNow) throw new Error('Χρειάζεται σύνδεση internet');
+        const { data, error } = await sb.rpc('accept_invitation', { invite_id: inviteId });
+        if(error) throw error;
+        return data; // restaurant_id (uuid)
+      },
+
+      // Decline an invitation addressed to the current user (deletes it).
+      async declineInvitation(inviteId){
+        if(!onlineNow) throw new Error('Χρειάζεται σύνδεση internet');
+        const { error } = await sb.rpc('decline_invitation', { invite_id: inviteId });
         if(error) throw error;
       },
     },
@@ -3849,29 +3872,74 @@ function setupRestaurantSwitcher(){
   });
 }
 
-// ─── Pending invites banner (on home page) ──────────────────────────────
+// ─── Pending invites banner (on home page) — INTERACTIVE ────────────────
 function renderPendingInvitesBanner(invites){
   const slot = $('pending-invites-slot');
   if(!slot) return;
   if(!invites || invites.length === 0){ slot.innerHTML = ''; return; }
-  // Get restaurant names for each invite (single fetch to enrich)
-  // We can't query 'restaurants' table for those IDs unless we're a member,
-  // so we just show "Restaurant" without a name.
-  // BUT — if the trigger has already auto-joined them, the membership exists.
-  // These are ONLY invites we haven't yet been auto-joined to, which means
-  // we have no access to restaurants.name. Show generic message.
-  slot.innerHTML = invites.map(inv => `
-    <div class="trial-banner" style="background:rgba(91,141,238,.12);border-color:rgba(91,141,238,.4)">
-      <span class="trial-icon">📨</span>
-      <div class="trial-body">
-        Έχεις <b>${invites.length}</b> εκκρεμή ${invites.length===1?'πρόσκληση':'προσκλήσεις'} σε άλλη ομάδα.
-        Επανεκκίνηση της εφαρμογής μπορεί να συγχρονίσει αυτόματα.
+
+  slot.innerHTML = invites.map(inv => {
+    const restName = inv.restaurant_name || 'Εστιατόριο';
+    const expiresAt = new Date(inv.expires_at);
+    const daysLeft = Math.ceil((expiresAt - new Date()) / 86400000);
+    return `<div class="invite-card" data-invite-card="${esc(inv.id)}">
+      <div class="invite-card-head">
+        <span class="invite-card-icon">📨</span>
+        <div class="invite-card-text">
+          <div class="invite-card-title">Πρόσκληση σε ομάδα</div>
+          <div class="invite-card-sub">Προσκλήθηκες στο <b>${esc(restName)}</b> · λήγει σε ${daysLeft} ${daysLeft===1?'ημέρα':'ημέρες'}</div>
+        </div>
       </div>
-    </div>
-  `).slice(0,1).join('');
-  // Note: We only show this banner ONCE (slice(0,1)) — duplicates would be noisy.
-  // In practice, if the user has invites they should already be auto-joined by the trigger
-  // when they next sign in (which is when this code runs). This banner is a fallback.
+      <div class="invite-card-actions">
+        <button class="btn btn-ghost btn-sm" data-decline-invite="${esc(inv.id)}" style="flex:1;color:var(--red);border-color:rgba(224,92,74,.4)">Απόρριψη</button>
+        <button class="btn btn-amber btn-sm" data-accept-invite="${esc(inv.id)}" data-rest-name="${esc(restName)}" style="flex:2">✓ Αποδοχή</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Wire accept buttons
+  slot.querySelectorAll('[data-accept-invite]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const inviteId = btn.dataset.acceptInvite;
+      const restName = btn.dataset.restName;
+      confirmAction('Αποδοχή Πρόσκλησης',
+        `Να γίνεις μέλος του «${restName}»; Θα έχεις πρόσβαση στα δεδομένα της ομάδας.`,
+        async () => {
+          setLoading(btn, true);
+          try {
+            const newRid = await db.team.acceptInvitation(inviteId);
+            toast('✓ Έγινες μέλος του ' + restName, 'ok');
+            // Switch to the newly-joined restaurant and reload
+            if(newRid) localStorage.setItem('kc:active_rid', newRid);
+            setTimeout(() => location.reload(), 700);
+          } catch(err){
+            setLoading(btn, false);
+            toast('Σφάλμα: ' + friendlyError(err), 'err', 4000);
+          }
+        }, 'Αποδοχή');
+    });
+  });
+
+  // Wire decline buttons
+  slot.querySelectorAll('[data-decline-invite]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const inviteId = btn.dataset.declineInvite;
+      confirmAction('Απόρριψη Πρόσκλησης',
+        'Να απορρίψεις αυτή την πρόσκληση; Δεν θα μπορείς να την αποδεχτείς αργότερα — ο ιδιοκτήτης θα πρέπει να σε προσκαλέσει ξανά.',
+        async () => {
+          try {
+            await db.team.declineInvitation(inviteId);
+            toast('Η πρόσκληση απορρίφθηκε', 'info');
+            // Remove the card from the banner
+            const card = slot.querySelector(`[data-invite-card="${inviteId}"]`);
+            if(card) card.remove();
+            if(!slot.querySelector('[data-invite-card]')) slot.innerHTML = '';
+          } catch(err){
+            toast('Σφάλμα: ' + friendlyError(err), 'err');
+          }
+        }, 'Απόρριψη');
+    });
+  });
 }
 
 // ─── Team page render ───────────────────────────────────────────────────
