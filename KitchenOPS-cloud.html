@@ -52,16 +52,44 @@
 html,body{margin:0;padding:0;background:var(--black);color:var(--cream);font-family:var(--body);min-height:100dvh;overscroll-behavior:none}
 body{display:flex;flex-direction:column}
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
-input[type="email"],input[type="password"],input[type="text"]{
+input[type="email"],input[type="password"],input[type="text"],
+input[type="number"],input[type="tel"],input[type="date"],
+input[type="time"],input[type="search"],select,textarea{
   -webkit-appearance:none;appearance:none;
   background:var(--panel);border:1.5px solid var(--border2);
   color:var(--cream);padding:13px 14px;border-radius:var(--rm);
   font-size:15px;width:100%;outline:none;transition:border-color .14s;
+  font-family:inherit;
 }
-input[type="email"]:focus,input[type="password"]:focus,input[type="text"]:focus{
+input[type="email"]:focus,input[type="password"]:focus,input[type="text"]:focus,
+input[type="number"]:focus,input[type="tel"]:focus,input[type="date"]:focus,
+input[type="time"]:focus,input[type="search"]:focus,select:focus,textarea:focus{
   border-color:var(--amber);
+  box-shadow:0 0 0 3px rgba(232,160,69,.12);
 }
-input::placeholder{color:var(--muted)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+
+/* Hide the ugly native number spinner arrows (we use steppers / presets instead) */
+input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* Style the <select> dropdown arrow (native arrow is hidden by appearance:none) */
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a0968a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:38px;
+  cursor:pointer;
+}
+select option{background:var(--panel);color:var(--cream)}
+
+/* Native date/time pickers: invert the calendar/clock icon so it's visible on dark */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator{
+  filter:invert(0.7) sepia(0.3) saturate(2) hue-rotate(2deg);
+  cursor:pointer;
+}
 
 /* ── HEADER ── */
 .hdr{position:sticky;top:0;background:linear-gradient(180deg,var(--black) 0%,var(--black) 70%,rgba(14,12,10,.85) 100%);padding:14px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--border);z-index:10;backdrop-filter:blur(6px)}
@@ -437,6 +465,115 @@ input::placeholder{color:var(--muted)}
 .sched-empty{padding:36px 18px;text-align:center;font-family:var(--cond);color:var(--muted2)}
 
 /* ════════════════════════════════════════════════════════════════════════
+   POLISH — Schedule fullscreen mode
+   ════════════════════════════════════════════════════════════════════════ */
+body.sched-fs{overflow:hidden}
+body.sched-fs .hdr{display:none}
+body.sched-fs .tabbar{display:none}
+body.sched-fs #rpicker{display:none}
+body.sched-fs .page{padding:0;margin:0;max-width:none}
+body.sched-fs #page-schedule{
+  position:fixed;inset:0;
+  padding:8px;margin:0;max-width:none;
+  background:var(--dark);
+  z-index:400;overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+body.sched-fs #page-schedule .page-title,
+body.sched-fs #page-schedule .page-sub{display:none}
+body.sched-fs #sched-content{padding-bottom:60px}
+
+/* Floating exit button — only visible in fullscreen */
+.sched-fs-exit{
+  position:fixed;top:max(10px,env(safe-area-inset-top));
+  right:max(10px,env(safe-area-inset-right));
+  z-index:500;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--panel2);border:1.5px solid var(--border2);
+  color:var(--cream);cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.5);
+}
+body.sched-fs .sched-fs-exit{display:flex}
+.sched-fs-exit:active{transform:scale(.9)}
+.sched-fs-exit svg{width:20px;height:20px;stroke-width:2.5}
+
+/* Fullscreen toggle button in the schedule toolbar */
+.sched-fs-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:var(--rm);
+  background:var(--panel);border:1.5px solid var(--border2);
+  color:var(--cream2);cursor:pointer;flex-shrink:0;
+}
+.sched-fs-btn:active{background:var(--panel2)}
+.sched-fs-btn svg{width:18px;height:18px;stroke-width:2}
+
+/* Rotate-to-landscape hint (shown briefly when entering fullscreen in portrait) */
+.rotate-hint{
+  position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(6px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;text-align:center;
+  animation:fadeIn .25s ease;
+}
+.rotate-hint.show{display:flex}
+.rotate-hint-icon{
+  font-size:60px;margin-bottom:18px;display:inline-block;
+  animation:rhSpin 2s ease-in-out infinite;
+}
+@keyframes rhSpin{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-90deg)}}
+.rotate-hint-title{
+  font-family:var(--hd);font-size:26px;letter-spacing:1.5px;color:var(--amber);
+  margin-bottom:8px;
+}
+.rotate-hint-sub{
+  font-family:var(--cond);font-size:13px;color:var(--cream2);max-width:280px;
+  line-height:1.5;margin-bottom:22px;
+}
+.rotate-hint-btn{
+  padding:10px 22px;background:var(--amber);color:var(--on-amber);border:none;
+  border-radius:var(--rm);font-family:var(--cond);font-size:12px;font-weight:800;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+}
+
+/* Landscape phone in fullscreen: trim vertical chrome so the Gantt gets room */
+@media(orientation:landscape) and (max-height:520px){
+  body.sched-fs .sched-nav{margin-bottom:6px}
+  body.sched-fs .sched-stats{margin-bottom:6px}
+  body.sched-fs .sched-toolbar{margin-bottom:6px}
+  body.sched-fs .sbox{padding:5px 10px}
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   POLISH — Schedule week view
+   ════════════════════════════════════════════════════════════════════════ */
+/* Day/Week toggle */
+.sched-view-toggle{display:inline-flex;background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:2px;gap:2px}
+.sview-btn{padding:6px 14px;border-radius:var(--r);background:transparent;border:none;color:var(--muted2);font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.sview-btn.on{background:var(--amber);color:var(--on-amber)}
+
+/* Week grid */
+.swk-wrap{border:1.5px solid var(--border);border-radius:var(--rm);background:var(--panel);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.swk-grid{min-width:560px}
+.swk-head{display:grid;grid-template-columns:104px repeat(7,1fr);background:var(--dark);border-bottom:1.5px solid var(--border)}
+.swk-head-cell{padding:6px 4px;text-align:center;border-left:1px solid var(--border)}
+.swk-head-cell:first-child{border-left:none}
+.swk-head-day{font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.swk-head-num{font-family:var(--hd);font-size:15px;color:var(--cream2);line-height:1.1;margin-top:1px}
+.swk-head-cell.today .swk-head-num{color:var(--amber)}
+.swk-head-cell.today .swk-head-day{color:var(--amber)}
+.swk-row{display:grid;grid-template-columns:104px repeat(7,1fr);border-bottom:1.5px solid var(--border)}
+.swk-row:last-child{border-bottom:none}
+.swk-res{padding:8px 8px;background:var(--panel);border-right:1.5px solid var(--border);display:flex;align-items:center;gap:6px;min-width:0}
+.swk-res-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.swk-res-name{font-family:var(--cond);font-size:11px;font-weight:700;color:var(--cream);letter-spacing:.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swk-cell{border-left:1px solid var(--border);min-height:48px;padding:3px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.swk-cell:active{background:var(--panel2)}
+.swk-cell.today{background:rgba(232,160,69,.05)}
+.swk-pill{border-radius:3px;padding:2px 4px;font-family:var(--cond);font-size:9px;font-weight:700;color:rgba(255,255,255,.95);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swk-cell-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--border2);font-family:var(--hd);font-size:14px}
+
+/* ════════════════════════════════════════════════════════════════════════
    PHASE 2D.1 — Team management (Διαχείριση Ομάδας)
    ════════════════════════════════════════════════════════════════════════ */
 
@@ -621,7 +758,7 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D.1b — Προσκλήσεις Ομάδας</div>
+      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D.1b — Διαχείριση Ομάδας (+ Polish)</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
         Νέο: Προσκάλεσε μέλη στην ομάδα σου με email. Όταν εγγραφούν με αυτό το email, θα γίνουν αυτόματα μέλη. Διαχείριση μελών και εκκρεμών προσκλήσεων.
         Αποδοχή ή απόρριψη προσκλήσεων μέσα από την εφαρμογή. Στο 2D.2: δυναμικά δικαιώματα.
@@ -636,7 +773,7 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2D.1b<br/>
+      KitchenOPS Cloud · Phase 2D.1b+<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -692,15 +829,21 @@ input::placeholder{color:var(--muted)}
   <main class="page has-tabbar hidden" id="page-schedule">
     <div class="page-title">Πρόγραμμα</div>
     <div class="page-sub">Βάρδιες ανά πόρο και ημέρα</div>
-    <div class="sched-nav">
-      <button class="sched-nav-btn" data-sched-nav="prev" title="Προηγούμενη ημέρα">
+    <div style="display:flex;justify-content:center;margin-bottom:10px">
+      <div class="sched-view-toggle">
+        <button class="sview-btn on" data-sched-view="day">Ημέρα</button>
+        <button class="sview-btn" data-sched-view="week">Εβδομάδα</button>
+      </div>
+    </div>
+    <div class="sched-nav" id="sched-nav-row">
+      <button class="sched-nav-btn" data-sched-nav="prev" title="Προηγούμενο">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <button class="sched-day-btn" id="sched-day-btn" data-sched-nav="today">
         <div class="sched-day-label" id="sched-day-label">—</div>
         <div class="sched-day-sub" id="sched-day-sub">—</div>
       </button>
-      <button class="sched-nav-btn" data-sched-nav="next" title="Επόμενη ημέρα">
+      <button class="sched-nav-btn" data-sched-nav="next" title="Επόμενο">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -708,6 +851,9 @@ input::placeholder{color:var(--muted)}
     <div class="sched-toolbar">
       <button class="btn btn-ghost btn-sm" id="btn-add-resource">👤 Νέος Πόρος</button>
       <div class="sched-tool-spacer"></div>
+      <button class="sched-fs-btn" id="btn-sched-fullscreen" title="Πλήρης οθόνη">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
     <div id="sched-content"></div>
   </main>
@@ -1043,6 +1189,17 @@ input::placeholder{color:var(--muted)}
 
 <!-- ─── PENDING INVITES BANNER (shown on home when user has pending invites for OTHER restaurants) ─── -->
 <!-- This is rendered dynamically into #pending-invites-slot -->
+
+<!-- ─── SCHEDULE FULLSCREEN: exit button + rotate hint ─── -->
+<button class="sched-fs-exit" id="sched-fs-exit" title="Έξοδος από πλήρη οθόνη" aria-label="Exit fullscreen">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+<div class="rotate-hint" id="rotate-hint">
+  <span class="rotate-hint-icon">📱</span>
+  <div class="rotate-hint-title">Γύρισε τη συσκευή</div>
+  <div class="rotate-hint-sub">Για καλύτερη προβολή του προγράμματος, γύρισε το τηλέφωνο σε οριζόντια θέση.</div>
+  <button class="rotate-hint-btn" id="rotate-hint-ok">Εντάξει</button>
+</div>
 
 <!-- ─── TOAST HOST ─── -->
 <div class="toast-host" id="toast-host"></div>
@@ -3474,26 +3631,70 @@ function fmtHourLabel(h){
 
 // ─── Schedule state ─────────────────────────────────────────────────────
 let schedCurrentDate = new Date(); // selected date
+let schedViewMode = (function(){
+  const v = localStorage.getItem('kc:sched_view');
+  return (v === 'week' || v === 'day') ? v : 'day';
+})();
 let editingResId = null;
 let editingShiftId = null;
 let resModalColor = COLOR_PALETTE[0];
 let shiftModalContext = null; // {resourceId, dateStr, prefillStart?}
 
+// Monday of the week containing date d (weeks start Monday)
+function getMonday(d){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = x.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? -6 : 1 - day); // shift back to Monday
+  x.setDate(x.getDate() + diff);
+  return x;
+}
+function addDays(d, n){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() + n);
+  return x;
+}
+
 // ─── Render the schedule page ───────────────────────────────────────────
 function renderSchedule(){
   if($('page-schedule').classList.contains('hidden')) return; // optimization
-  renderSchedNav();
-  renderSchedStats();
-  renderSchedGantt();
+  // Sync the view-toggle buttons
+  document.querySelectorAll('[data-sched-view]').forEach(b => {
+    b.classList.toggle('on', b.dataset.schedView === schedViewMode);
+  });
+  if(schedViewMode === 'week'){
+    renderSchedNavWeek();
+    renderSchedStatsWeek();
+    renderSchedWeek();
+  } else {
+    renderSchedNav();
+    renderSchedStats();
+    renderSchedGantt();
+  }
 }
 
 function renderSchedNav(){
   const d = schedCurrentDate;
   const dayName = DAY_NAMES_GR[d.getDay()];
-  const dateLabel = `${d.getDate()} ${MONTH_NAMES_GR_FULL[d.getMonth()]} ${d.getFullYear()}`;
   $('sched-day-label').textContent = `${dayName}, ${d.getDate()} ${MONTH_NAMES_GR_FULL[d.getMonth()].slice(0,3)} ${d.getFullYear()}`;
   $('sched-day-sub').textContent = isToday(d) ? 'Σήμερα' : 'Πατήστε για σήμερα';
   $('sched-day-btn').classList.toggle('current', isToday(d));
+}
+
+// Week-view nav: show the Mon–Sun range
+function renderSchedNavWeek(){
+  const monday = getMonday(schedCurrentDate);
+  const sunday = addDays(monday, 6);
+  const isCurrentWeek = localISODate(getMonday(new Date())) === localISODate(monday);
+  const sameMonth = monday.getMonth() === sunday.getMonth();
+  let range;
+  if(sameMonth){
+    range = `${monday.getDate()}–${sunday.getDate()} ${MONTH_NAMES_GR_FULL[monday.getMonth()].slice(0,3)}`;
+  } else {
+    range = `${monday.getDate()} ${MONTH_NAMES_GR_FULL[monday.getMonth()].slice(0,3)} – ${sunday.getDate()} ${MONTH_NAMES_GR_FULL[sunday.getMonth()].slice(0,3)}`;
+  }
+  $('sched-day-label').textContent = range;
+  $('sched-day-sub').textContent = isCurrentWeek ? 'Τρέχουσα εβδομάδα' : 'Πατήστε για σήμερα';
+  $('sched-day-btn').classList.toggle('current', isCurrentWeek);
 }
 
 function renderSchedStats(){
@@ -3508,6 +3709,103 @@ function renderSchedStats(){
     <div class="sbox"><div class="slbl">Βάρδιες</div><div class="sval">${dayShifts.length}</div></div>
     <div class="sbox"><div class="slbl">Ώρες</div><div class="sval c-green">${totalHours}</div></div>
   `;
+}
+
+function renderSchedStatsWeek(){
+  const monday = getMonday(schedCurrentDate);
+  const resources = db.resources.list();
+  let totalShifts = 0, totalHours = 0;
+  for(let i = 0; i < 7; i++){
+    const ds = db.shifts.forDate(localISODate(addDays(monday, i)));
+    ds.forEach(s => { totalShifts++; totalHours += +s.duration || 0; });
+  }
+  $('sched-stats').innerHTML = `
+    <div class="sbox"><div class="slbl">Πόροι</div><div class="sval c-amber">${resources.length}</div></div>
+    <div class="sbox"><div class="slbl">Βάρδιες/εβδ.</div><div class="sval">${totalShifts}</div></div>
+    <div class="sbox"><div class="slbl">Ώρες/εβδ.</div><div class="sval c-green">${totalHours}</div></div>
+  `;
+}
+
+// ─── Week view render ───────────────────────────────────────────────────
+function renderSchedWeek(){
+  const host = $('sched-content');
+  const resources = db.resources.list();
+
+  if(resources.length === 0){
+    host.innerHTML = `<div class="empty">
+      <div class="empty-icon">👥</div>
+      <div class="empty-title">Δεν έχεις πόρους ακόμα</div>
+      <div class="empty-sub">Πάτησε «Νέος Πόρος» για να ξεκινήσεις</div>
+    </div>`;
+    return;
+  }
+
+  const monday = getMonday(schedCurrentDate);
+  const weekDates = [];
+  for(let i = 0; i < 7; i++) weekDates.push(addDays(monday, i));
+  const dayShort = ['Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ','Κυρ'];
+
+  // Header row
+  const headCells = weekDates.map((d, i) => {
+    const today = isToday(d);
+    return `<div class="swk-head-cell ${today?'today':''}">
+      <div class="swk-head-day">${dayShort[i]}</div>
+      <div class="swk-head-num">${d.getDate()}</div>
+    </div>`;
+  }).join('');
+
+  // Resource rows
+  const rows = resources.map(r => {
+    const cells = weekDates.map(d => {
+      const dateStr = localISODate(d);
+      const shifts = db.shifts.forDate(dateStr).filter(s => s.resource_id === r.id)
+        .sort((a,b) => a.start_hour - b.start_hour);
+      const today = isToday(d);
+      let inner;
+      if(shifts.length){
+        inner = shifts.map(s => {
+          const end = (+s.start_hour) + (+s.duration);
+          return `<div class="swk-pill" data-wk-shift="${esc(s.id)}" style="background:${esc(r.color)}">${fmtHourLabel(s.start_hour)}-${fmtHourLabel(end)}</div>`;
+        }).join('');
+      } else {
+        inner = `<div class="swk-cell-empty">+</div>`;
+      }
+      return `<div class="swk-cell ${today?'today':''}" data-wk-cell="${esc(r.id)}|${dateStr}">${inner}</div>`;
+    }).join('');
+    return `<div class="swk-row">
+      <div class="swk-res">
+        <span class="swk-res-dot" style="background:${esc(r.color)}"></span>
+        <span class="swk-res-name">${esc(r.name)}</span>
+      </div>
+      ${cells}
+    </div>`;
+  }).join('');
+
+  host.innerHTML = `<div class="swk-wrap">
+    <div class="swk-grid">
+      <div class="swk-head">
+        <div class="swk-head-cell"></div>
+        ${headCells}
+      </div>
+      ${rows}
+    </div>
+  </div>`;
+
+  // Wire: tap a shift pill → edit
+  host.querySelectorAll('[data-wk-shift]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openShiftModal(null, null, el.dataset.wkShift);
+    });
+  });
+  // Wire: tap an empty cell → new shift for that resource+date
+  host.querySelectorAll('[data-wk-cell]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if(e.target.closest('[data-wk-shift]')) return;
+      const [resId, dateStr] = el.dataset.wkCell.split('|');
+      openShiftModal(resId, dateStr, null, 9);
+    });
+  });
 }
 
 function renderSchedGantt(){
@@ -3619,10 +3917,11 @@ function setupScheduleNav(){
   document.querySelectorAll('[data-sched-nav]').forEach(btn => {
     btn.addEventListener('click', () => {
       const action = btn.dataset.schedNav;
+      const step = (schedViewMode === 'week') ? 7 : 1; // days to move
       if(action === 'prev'){
-        schedCurrentDate = new Date(schedCurrentDate.getTime() - 86400000);
+        schedCurrentDate = addDays(schedCurrentDate, -step);
       } else if(action === 'next'){
-        schedCurrentDate = new Date(schedCurrentDate.getTime() + 86400000);
+        schedCurrentDate = addDays(schedCurrentDate, step);
       } else if(action === 'today'){
         schedCurrentDate = new Date();
       }
@@ -3630,6 +3929,17 @@ function setupScheduleNav(){
     });
   });
   $('btn-add-resource').addEventListener('click', () => openResourceModal(null));
+
+  // Day / Week view toggle
+  document.querySelectorAll('[data-sched-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.schedView;
+      if(mode !== 'day' && mode !== 'week') return;
+      schedViewMode = mode;
+      try { localStorage.setItem('kc:sched_view', mode); } catch {}
+      renderSchedule();
+    });
+  });
 }
 
 // ─── Resource modal ─────────────────────────────────────────────────────
@@ -3789,10 +4099,82 @@ function saveShiftFromModal(){
 }
 
 // ─── Wire up ────────────────────────────────────────────────────────────
+// ─── Schedule fullscreen mode ───────────────────────────────────────────
+let schedIsFullscreen = false;
+let rotateHintShown = false; // once per session
+
+function enterSchedFullscreen(){
+  document.body.classList.add('sched-fs');
+  schedIsFullscreen = true;
+
+  // Try to lock orientation to landscape (works on Android Chrome, best in PWA)
+  try {
+    if(screen.orientation && typeof screen.orientation.lock === 'function'){
+      screen.orientation.lock('landscape').catch(() => maybeShowRotateHint());
+    } else {
+      maybeShowRotateHint();
+    }
+  } catch { maybeShowRotateHint(); }
+
+  // Use the Fullscreen API where available
+  try {
+    const el = document.documentElement;
+    if(el.requestFullscreen) el.requestFullscreen().catch(() => {});
+    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  } catch {}
+
+  renderSchedule();
+}
+
+function exitSchedFullscreen(){
+  document.body.classList.remove('sched-fs');
+  schedIsFullscreen = false;
+  try {
+    if(screen.orientation && typeof screen.orientation.unlock === 'function'){
+      screen.orientation.unlock();
+    }
+  } catch {}
+  try {
+    if(document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if(document.webkitExitFullscreen && document.webkitFullscreenElement) document.webkitExitFullscreen();
+  } catch {}
+  renderSchedule();
+}
+
+function maybeShowRotateHint(){
+  if(rotateHintShown) return;
+  const isPortrait = window.innerHeight > window.innerWidth;
+  if(!isPortrait) return;
+  if(window.innerWidth > 900) return; // phones only
+  rotateHintShown = true;
+  $('rotate-hint').classList.add('show');
+  setTimeout(() => $('rotate-hint').classList.remove('show'), 3500);
+}
+
 function setupSchedule(){
   setupScheduleNav();
   $('res-save').addEventListener('click', saveResourceFromModal);
   $('shift-save').addEventListener('click', saveShiftFromModal);
+
+  // Fullscreen wiring
+  $('btn-sched-fullscreen').addEventListener('click', enterSchedFullscreen);
+  $('sched-fs-exit').addEventListener('click', exitSchedFullscreen);
+  $('rotate-hint-ok').addEventListener('click', () => $('rotate-hint').classList.remove('show'));
+
+  // Exit fullscreen if the user leaves it via the browser (e.g. Esc / back gesture)
+  document.addEventListener('fullscreenchange', () => {
+    if(!document.fullscreenElement && schedIsFullscreen){
+      document.body.classList.remove('sched-fs');
+      schedIsFullscreen = false;
+      try { if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch {}
+      renderSchedule();
+    }
+  });
+
+  // Re-render on orientation change to recalc Gantt sizing
+  window.addEventListener('orientationchange', () => {
+    if(schedIsFullscreen) setTimeout(renderSchedule, 200);
+  });
 }
 
 // ─── Hook: re-render schedule when tab opens, plus add categories button ─
