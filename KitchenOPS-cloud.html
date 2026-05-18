@@ -43,10 +43,42 @@
   --blue:#5b8dee;
   --blue-dim:rgba(91,141,238,0.12);
   --on-amber:#1a1108;
+  --shadow:rgba(0,0,0,0.4);
+  --off-hours-tint:rgba(0,0,0,0.25);
   --r:5px;--rm:8px;
   --hd:'Bebas Neue',sans-serif;
   --cond:'Barlow Condensed',sans-serif;
   --body:'Barlow',sans-serif;
+}
+
+/* ── LIGHT THEME ──────────────────────────────────────────────────────────
+   Applied when <html data-theme="light">. A warm off-white palette to match
+   the app's amber character (not a cold blue-white).
+   "Auto" mode resolves to either dark or light via JS, then sets data-theme
+   explicitly — so this block is the single source of truth for light. */
+html[data-theme="light"]{
+  --black:#ffffff;
+  --dark:#f4f1ea;        /* page background — warm paper */
+  --panel:#ffffff;       /* cards */
+  --panel2:#ece7dc;      /* pressed / hover */
+  --border:#e0d9ca;
+  --border2:#cdc3ad;
+  --amber:#c87f1e;       /* darker amber so it reads on white */
+  --amber2:#a8691a;
+  --amber-dim:rgba(200,127,30,0.12);
+  --cream:#2a241c;       /* "cream" is the main text — now dark on light */
+  --cream2:#5c5345;      /* secondary text */
+  --muted:#8a8070;
+  --muted2:#ada291;
+  --red:#c8412f;
+  --red-dim:rgba(200,65,47,0.10);
+  --green:#3f8a4f;
+  --green-dim:rgba(63,138,79,0.10);
+  --blue:#3866c8;
+  --blue-dim:rgba(56,102,200,0.10);
+  --on-amber:#ffffff;    /* text on amber buttons — white reads on darker amber */
+  --shadow:rgba(80,60,20,0.16);
+  --off-hours-tint:rgba(120,100,60,0.10);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:var(--black);color:var(--cream);font-family:var(--body);min-height:100dvh;overscroll-behavior:none}
@@ -442,7 +474,7 @@ input[type="time"]::-webkit-calendar-picker-indicator{
 .sgantt-grid{position:absolute;left:110px;top:0;right:0;bottom:0;cursor:pointer}
 .sgantt-hour-line{position:absolute;top:0;bottom:0;width:1px;background:var(--border);pointer-events:none}
 .sgantt-hour-line.major{background:var(--border2)}
-.sgantt-offhours{position:absolute;top:0;bottom:0;background:rgba(0,0,0,0.25);pointer-events:none}
+.sgantt-offhours{position:absolute;top:0;bottom:0;background:var(--off-hours-tint);pointer-events:none}
 
 /* ── Shift pucks ── */
 .sgantt-puck{position:absolute;top:4px;bottom:4px;border-radius:var(--r);padding:4px 6px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;overflow:hidden;font-family:var(--cond);box-shadow:0 1px 3px rgba(0,0,0,0.4);min-width:24px;z-index:2}
@@ -635,7 +667,44 @@ body.sched-fs .sched-fs-exit{display:flex}
 
 /* Empty state for orders */
 /* (re-uses .empty class)*/
+
+/* ════════════════════════════════════════════════════════════════════════
+   Settings page
+   ════════════════════════════════════════════════════════════════════════ */
+.settings-section{margin-bottom:20px}
+.settings-section-title{font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin:0 0 10px;padding-left:2px}
+.settings-hint{font-family:var(--cond);font-size:11px;color:var(--muted2);letter-spacing:.3px;margin:8px 0 0;line-height:1.4;padding-left:2px}
+
+/* Theme picker */
+.theme-options{display:flex;gap:8px}
+.theme-opt{flex:1;background:var(--panel);border:1.5px solid var(--border2);border-radius:var(--rm);padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
+.theme-opt:active{transform:scale(.97)}
+.theme-opt.on{border-color:var(--amber);background:var(--amber-dim)}
+.theme-opt-label{font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--cream)}
+.theme-swatch{width:100%;height:40px;border-radius:var(--r);border:1.5px solid var(--border2)}
+.swatch-dark{background:linear-gradient(135deg,#161310 50%,#1e1a16 50%)}
+.swatch-dark::after,.swatch-light::after,.swatch-auto::after{content:'';display:block;width:14px;height:14px;border-radius:50%;background:#e8a045;margin:13px auto 0}
+.swatch-light{background:linear-gradient(135deg,#f4f1ea 50%,#ffffff 50%)}
+.swatch-light::after{background:#c87f1e}
+.swatch-auto{background:linear-gradient(135deg,#161310 50%,#f4f1ea 50%)}
+.theme-opt.on .theme-swatch{border-color:var(--amber)}
 </style>
+<script>
+// ── Early theme application (runs before render to prevent a flash-of-wrong-theme)
+(function(){
+  try {
+    var pref = localStorage.getItem('kc:theme') || 'dark'; // 'dark' | 'light' | 'auto'
+    var resolved = pref;
+    if(pref === 'auto'){
+      resolved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
+        ? 'light' : 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', resolved);
+  } catch(e){
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+</script>
 </head>
 <body>
 
@@ -758,7 +827,7 @@ body.sched-fs .sched-fs-exit{display:flex}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D.1b — Διαχείριση Ομάδας (+ Polish)</div>
+      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D — Ρυθμίσεις & Θέματα</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
         Νέο: Προσκάλεσε μέλη στην ομάδα σου με email. Όταν εγγραφούν με αυτό το email, θα γίνουν αυτόματα μέλη. Διαχείριση μελών και εκκρεμών προσκλήσεων.
         Αποδοχή ή απόρριψη προσκλήσεων μέσα από την εφαρμογή. Στο 2D.2: δυναμικά δικαιώματα.
@@ -767,13 +836,14 @@ body.sched-fs .sched-fs-exit{display:flex}
 
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
       <button class="btn btn-ghost" id="btn-go-team" style="flex:1;min-width:160px">👥 Διαχείριση Ομάδας</button>
+      <button class="btn btn-ghost" id="btn-go-settings" style="flex:1;min-width:140px">⚙️ Ρυθμίσεις</button>
       <button class="btn btn-ghost" id="btn-import" style="flex:1;min-width:160px">📂 Εισαγωγή από JSON</button>
       <button class="btn btn-ghost" id="btn-go-categories" style="flex:1;min-width:140px">🗂 Κατηγορίες</button>
       <button class="btn btn-ghost" id="btn-logout" style="flex:1;min-width:140px">Αποσύνδεση</button>
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2D.1b+<br/>
+      KitchenOPS Cloud · Phase 2D<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -863,6 +933,79 @@ body.sched-fs .sched-fs-exit{display:flex}
     <div class="page-title">Ομάδα</div>
     <div class="page-sub" id="team-sub">— μέλη</div>
     <div id="team-content"></div>
+  </main>
+
+  <!-- SETTINGS page (Ρυθμίσεις) -->
+  <main class="page has-tabbar hidden" id="page-settings">
+    <div class="page-title">Ρυθμίσεις</div>
+    <div class="page-sub">Εμφάνιση, λογαριασμός και δεδομένα</div>
+
+    <!-- Theme -->
+    <div class="settings-section">
+      <div class="settings-section-title">🎨 Θέμα Εμφάνισης</div>
+      <div class="theme-options" id="theme-options">
+        <button class="theme-opt" data-theme-opt="dark">
+          <span class="theme-swatch swatch-dark"></span>
+          <span class="theme-opt-label">Σκούρο</span>
+        </button>
+        <button class="theme-opt" data-theme-opt="light">
+          <span class="theme-swatch swatch-light"></span>
+          <span class="theme-opt-label">Ανοιχτό</span>
+        </button>
+        <button class="theme-opt" data-theme-opt="auto">
+          <span class="theme-swatch swatch-auto"></span>
+          <span class="theme-opt-label">Αυτόματο</span>
+        </button>
+      </div>
+      <p class="settings-hint" id="theme-hint">Το «Αυτόματο» ακολουθεί τη ρύθμιση της συσκευής σου.</p>
+    </div>
+
+    <!-- Restaurant -->
+    <div class="settings-section" id="settings-rest-section">
+      <div class="settings-section-title">🏪 Εστιατόριο</div>
+      <div class="fg">
+        <label class="fl">Όνομα Εστιατορίου</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="settings-rest-name" placeholder="Όνομα" autocomplete="off" style="flex:1"/>
+          <button class="btn btn-amber" id="settings-rest-save" style="flex:0;padding:13px 18px;margin:0">Αποθήκευση</button>
+        </div>
+      </div>
+      <p class="settings-hint" id="settings-rest-hint">Μόνο ο ιδιοκτήτης μπορεί να αλλάξει το όνομα.</p>
+    </div>
+
+    <!-- Account -->
+    <div class="settings-section">
+      <div class="settings-section-title">👤 Λογαριασμός</div>
+      <div class="info-card" style="margin:0">
+        <div class="info-card-row"><span class="lbl">Email</span><span class="val" id="set-email">—</span></div>
+        <div class="info-card-row"><span class="lbl">Ρόλος</span><span class="val amber" id="set-role">—</span></div>
+        <div class="info-card-row"><span class="lbl">Εστιατόριο</span><span class="val" id="set-rest">—</span></div>
+        <div class="info-card-row"><span class="lbl">Πλάνο</span><span class="val" id="set-plan">—</span></div>
+        <div class="info-card-row"><span class="lbl">Συνδρομή</span><span class="val" id="set-sub">—</span></div>
+      </div>
+    </div>
+
+    <!-- Data -->
+    <div class="settings-section">
+      <div class="settings-section-title">💾 Δεδομένα</div>
+      <button class="btn btn-ghost" id="settings-export" style="margin-bottom:8px">⬇️ Εξαγωγή Αντιγράφου (JSON)</button>
+      <button class="btn btn-ghost" id="settings-import">📂 Εισαγωγή από JSON</button>
+      <p class="settings-hint">Η εξαγωγή δημιουργεί ένα αρχείο με όλα τα δεδομένα του εστιατορίου (προϊόντα, παραγγελίες, πρόγραμμα). Κράτα το ως αντίγραφο ασφαλείας.</p>
+    </div>
+
+    <!-- About -->
+    <div class="settings-section">
+      <div class="settings-section-title">ℹ️ Σχετικά</div>
+      <div class="info-card" style="margin:0">
+        <div class="info-card-row"><span class="lbl">Έκδοση</span><span class="val">KitchenOPS Cloud · 2D</span></div>
+        <div class="info-card-row"><span class="lbl">Συγχρονισμός</span><span class="val" id="set-sync">—</span></div>
+        <div class="info-card-row"><span class="lbl">Σύνδεση</span><span class="val" id="set-conn" style="font-size:11px">—</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px">
+      <button class="btn btn-ghost" id="settings-logout" style="color:var(--red);border-color:rgba(224,92,74,.4)">Αποσύνδεση</button>
+    </div>
   </main>
 
   <!-- FAB (changes per page) -->
@@ -1247,6 +1390,44 @@ const show = (id) => $(id).classList.remove('hidden');
 const hide = (id) => $(id).classList.add('hidden');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 
+// ─── THEME SYSTEM ────────────────────────────────────────────────────────
+// Preference is one of: 'dark' | 'light' | 'auto'.
+// 'auto' resolves live against the OS prefers-color-scheme.
+const themeSystem = (() => {
+  let pref = 'dark';
+  try { pref = localStorage.getItem('kc:theme') || 'dark'; } catch {}
+  if(pref !== 'dark' && pref !== 'light' && pref !== 'auto') pref = 'dark';
+
+  const mql = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+
+  function resolved(){
+    if(pref === 'auto') return (mql && mql.matches) ? 'light' : 'dark';
+    return pref;
+  }
+  function apply(){
+    document.documentElement.setAttribute('data-theme', resolved());
+  }
+  // If the OS theme changes while in 'auto' mode, follow it live
+  if(mql){
+    const onChange = () => { if(pref === 'auto') apply(); };
+    if(mql.addEventListener) mql.addEventListener('change', onChange);
+    else if(mql.addListener) mql.addListener(onChange); // older browsers
+  }
+  return {
+    get(){ return pref; },
+    resolved,
+    set(newPref){
+      if(newPref !== 'dark' && newPref !== 'light' && newPref !== 'auto') return;
+      pref = newPref;
+      try { localStorage.setItem('kc:theme', pref); } catch {}
+      apply();
+    },
+    apply,
+  };
+})();
+themeSystem.apply(); // ensure consistency with the early head script
+
+
 function msg(el, type, text){
   if(!text){ el.innerHTML = ''; return; }
   const icon = type === 'err' ? '⚠️' : (type === 'ok' ? '✓' : 'ℹ');
@@ -1529,8 +1710,10 @@ async function loadDashboard(){
       setupReceiveModal();
       setupSchedule();
       setupTeam();
+      setupSettings();
       $('btn-go-categories').addEventListener('click', () => switchTab('categories'));
       $('btn-go-team').addEventListener('click', () => switchTab('team'));
+      $('btn-go-settings').addEventListener('click', () => switchTab('settings'));
       window._kc_ui_inited = true;
     }
     renderProducts(); renderProviders(); renderCategories();
@@ -2166,6 +2349,42 @@ const db = (() => {
         const { error } = await sb.rpc('decline_invitation', { invite_id: inviteId });
         if(error) throw error;
       },
+    },
+
+    // ─── RESTAURANT SETTINGS (Phase 2D — settings) ───────────────────────
+    restaurant: {
+      // Rename the current restaurant. Owner-only (enforced by RLS).
+      async rename(newName){
+        if(!onlineNow) throw new Error('Χρειάζεται σύνδεση internet');
+        newName = (newName || '').trim();
+        if(!newName) throw new Error('Το όνομα είναι υποχρεωτικό');
+        if(newName.length > 80) throw new Error('Το όνομα είναι πολύ μεγάλο');
+        const { error } = await sb
+          .from('restaurants')
+          .update({ name: newName })
+          .eq('id', rid);
+        if(error) throw error;
+        // Update local membership cache so the switcher/labels refresh
+        const mem = (availableMemberships || []).find(m => m.restaurants && m.restaurants.id === rid);
+        if(mem && mem.restaurants) mem.restaurants.name = newName;
+        return newName;
+      },
+    },
+
+    // Expose a full snapshot of cached data for export/backup
+    exportAll(){
+      return {
+        kitchenops_export: true,
+        version: '2D',
+        exported_at: new Date().toISOString(),
+        restaurant_id: rid,
+        categories: cache.categories || [],
+        providers: cache.providers || [],
+        products: cache.products || [],
+        orders: cache.orders || [],
+        resources: cache.resources || [],
+        shifts: cache.shifts || [],
+      };
     },
 
     orders: {
@@ -3564,7 +3783,7 @@ switchTab = function(t){
   }
   currentTab = t;
   document.querySelectorAll('.tabbar-btn').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  ['home','checklist','products','orders','providers','categories','schedule','team'].forEach(name => {
+  ['home','checklist','products','orders','providers','categories','schedule','team','settings'].forEach(name => {
     const el = $('page-' + name);
     if(el) el.classList.toggle('hidden', name !== t);
   });
@@ -4183,6 +4402,7 @@ switchTab = function(t){
   _prevSwitchTab2(t);
   if(t === 'schedule') renderSchedule();
   if(t === 'team') renderTeamPage();
+  if(t === 'settings') renderSettingsPage();
 };
 
 // ════════════════════════════════════════════════════════════════════════
@@ -4507,6 +4727,117 @@ function setupTeam(){
 
 // ════════════════════════════════════════════════════════════════════════
 // END PHASE 2D.1
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// SETTINGS PAGE
+// ════════════════════════════════════════════════════════════════════════
+function renderSettingsPage(){
+  // ── Theme: highlight the active option
+  const pref = themeSystem.get();
+  document.querySelectorAll('[data-theme-opt]').forEach(btn => {
+    btn.classList.toggle('on', btn.dataset.themeOpt === pref);
+  });
+  $('theme-hint').textContent = pref === 'auto'
+    ? `Το «Αυτόματο» ακολουθεί τη συσκευή σου (τώρα: ${themeSystem.resolved() === 'light' ? 'ανοιχτό' : 'σκούρο'}).`
+    : 'Το «Αυτόματο» ακολουθεί τη ρύθμιση της συσκευής σου.';
+
+  // ── Restaurant section
+  const isOwner = db.team.amOwner();
+  const restName = (availableMemberships.find(m => m.restaurants && m.restaurants.id === currentRestId)
+    || {}).restaurants;
+  $('settings-rest-name').value = restName ? restName.name : '';
+  $('settings-rest-name').disabled = !isOwner;
+  $('settings-rest-save').disabled = !isOwner;
+  $('settings-rest-hint').textContent = isOwner
+    ? 'Η αλλαγή θα φανεί σε όλα τα μέλη της ομάδας.'
+    : 'Μόνο ο ιδιοκτήτης μπορεί να αλλάξει το όνομα.';
+
+  // ── Account info
+  $('set-email').textContent = currentUserEmail || '—';
+  $('set-role').textContent = isOwner ? 'Ιδιοκτήτης' : 'Μέλος';
+  $('set-rest').textContent = restName ? restName.name : '—';
+  const planVal = restName && restName.plan ? restName.plan : 'basic';
+  $('set-plan').textContent = planVal.charAt(0).toUpperCase() + planVal.slice(1);
+  // Trial / subscription line
+  if(restName && restName.trial_ends_at){
+    const daysLeft = Math.ceil((new Date(restName.trial_ends_at) - new Date()) / 86400000);
+    $('set-sub').textContent = daysLeft > 0 ? `Δοκιμή — ${daysLeft} ημέρες` : 'Δοκιμή έληξε';
+  } else {
+    $('set-sub').textContent = '—';
+  }
+
+  // ── About
+  const syncStatus = db.sync.status();
+  $('set-sync').textContent = syncStatus === 'synced' ? 'Συγχρονισμένο'
+    : syncStatus === 'pending' ? `${db.sync.queueLen()} σε αναμονή` : 'Εκτός σύνδεσης';
+  $('set-conn').textContent = SUPABASE_URL.replace('https://', '').replace('.supabase.co', '');
+}
+
+function setupSettings(){
+  // Theme option buttons
+  document.querySelectorAll('[data-theme-opt]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      themeSystem.set(btn.dataset.themeOpt);
+      renderSettingsPage(); // refresh highlight + hint
+      toast('Το θέμα άλλαξε', 'ok', 1400);
+    });
+  });
+
+  // Restaurant rename
+  $('settings-rest-save').addEventListener('click', async () => {
+    const newName = $('settings-rest-name').value.trim();
+    if(!newName){ toast('Δώσε ένα όνομα', 'err'); return; }
+    setLoading($('settings-rest-save'), true);
+    try {
+      await db.restaurant.rename(newName);
+      toast('✓ Το όνομα αποθηκεύτηκε', 'ok');
+      renderRestaurantSwitcher();
+      renderSettingsPage();
+      // Refresh the home greeting subtitle if present
+      const gsub = $('greeting-sub');
+      if(gsub) gsub.textContent = 'Διαχειρίζεσαι το ' + newName;
+    } catch(err){
+      toast('Σφάλμα: ' + friendlyError(err), 'err', 4000);
+    } finally {
+      setLoading($('settings-rest-save'), false);
+    }
+  });
+
+  // Data export
+  $('settings-export').addEventListener('click', () => {
+    try {
+      const data = db.exportAll();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const stamp = new Date().toISOString().slice(0,10);
+      a.download = `kitchenops-backup-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast('✓ Το αντίγραφο κατέβηκε', 'ok');
+    } catch(err){
+      toast('Σφάλμα εξαγωγής: ' + friendlyError(err), 'err');
+    }
+  });
+
+  // Import — reuse the existing import modal
+  $('settings-import').addEventListener('click', () => {
+    $('import-modal').classList.add('show');
+    if(typeof resetImportModal === 'function') resetImportModal();
+  });
+
+  // Logout from settings
+  $('settings-logout').addEventListener('click', () => {
+    $('btn-logout').click(); // reuse the existing logout handler
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// END SETTINGS
 // ════════════════════════════════════════════════════════════════════════
 
 // ─── INITIAL BOOT: check existing session ────────────────────────────────
