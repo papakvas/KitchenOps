@@ -3,8 +3,20 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#0e0c0a"/>
-<title>KitchenOPS Cloud</title>
+<meta name="theme-color" content="#e8a045" media="(prefers-color-scheme: light)"/>
+<meta name="theme-color" content="#161310" media="(prefers-color-scheme: dark)"/>
+<title>KitchenOPS</title>
+
+<!-- ── PWA manifest + icons ───────────────────────────────────────────── -->
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="KitchenOPS"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet"/>
@@ -268,6 +280,7 @@ input[type="time"]::-webkit-calendar-picker-indicator{
 .lcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .lcard-qty{font-family:var(--hd);font-size:22px;letter-spacing:1px;color:var(--cream);line-height:1}
 .lcard-qty.low{color:var(--red)}
+.lcard-unit{font-family:var(--cond);font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);line-height:1;margin-top:2px;text-align:right}
 .lcard-actions{display:flex;gap:6px;align-items:center}
 .lcard-btn{width:28px;height:28px;border-radius:var(--r);background:var(--dark);border:1.5px solid var(--border2);color:var(--cream2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:var(--hd);font-size:14px;line-height:1}
 .lcard-btn:active{background:var(--panel2)}
@@ -718,11 +731,11 @@ body.sched-fs .sched-fs-exit{display:flex}
 <div class="config-err hidden" id="config-err">
   <div class="config-err-card">
     <h1>⚠️ CONFIG MISSING</h1>
-    <p>Πριν χρησιμοποιήσεις την εφαρμογή, πρέπει να συμπληρώσεις τα δικά σου Supabase credentials στην αρχή του αρχείου HTML.</p>
-    <p>Άνοιξε το αρχείο με έναν text editor και βρες αυτές τις γραμμές:</p>
-    <code>const SUPABASE_URL = '...';</code>
-    <code>const SUPABASE_ANON_KEY = '...';</code>
-    <p>Αντικατάστησε τις τιμές με αυτές από το Supabase Dashboard → Settings → API.</p>
+    <p>Δεν βρέθηκαν τα Supabase credentials. Βεβαιώσου ότι το αρχείο <code>config.js</code> βρίσκεται δίπλα στο HTML και έχει σωστές τιμές.</p>
+    <p>Άνοιξε το <code>config.js</code> και συμπλήρωσε:</p>
+    <code>SUPABASE_URL: '...'</code>
+    <code>SUPABASE_ANON_KEY: '...'</code>
+    <p>Τις τιμές θα τις βρεις στο Supabase Dashboard → Project Settings → API.</p>
   </div>
 </div>
 
@@ -827,7 +840,7 @@ body.sched-fs .sched-fs-exit{display:flex}
     </div>
 
     <div class="info-card" style="border-color:var(--amber);background:var(--amber-dim)">
-      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D — Ρυθμίσεις & Θέματα</div>
+      <div class="info-card-title" style="color:var(--amber)">👥 Phase 2D — PWA</div>
       <p style="font-family:var(--body);font-size:13px;line-height:1.5;color:var(--cream);margin:6px 0 0">
         Νέο: Προσκάλεσε μέλη στην ομάδα σου με email. Όταν εγγραφούν με αυτό το email, θα γίνουν αυτόματα μέλη. Διαχείριση μελών και εκκρεμών προσκλήσεων.
         Αποδοχή ή απόρριψη προσκλήσεων μέσα από την εφαρμογή. Στο 2D.2: δυναμικά δικαιώματα.
@@ -843,7 +856,7 @@ body.sched-fs .sched-fs-exit{display:flex}
     </div>
 
     <div class="dash-footer">
-      KitchenOPS Cloud · Phase 2D<br/>
+      KitchenOPS Cloud · Phase 2D++<br/>
       Connected to: <span id="footer-url" style="color:var(--cream2)">—</span>
     </div>
   </main>
@@ -1193,6 +1206,10 @@ body.sched-fs .sched-fs-exit{display:flex}
         <label class="fl">Προμηθευτής</label>
         <select id="prod-provider"><option value="">— Κανένας —</option></select>
       </div>
+      <div class="fg">
+        <label class="fl">Μονάδα μέτρησης</label>
+        <select id="prod-unit"></select>
+      </div>
       <div class="fg" style="display:flex;gap:10px">
         <div style="flex:1">
           <label class="fl">Ποσότητα</label>
@@ -1350,27 +1367,29 @@ body.sched-fs .sched-fs-exit{display:flex}
 <!-- ─────────────────────────────────────────────────────────────────────
      SUPABASE CLIENT (from CDN — no build step needed)
 ───────────────────────────────────────────────────────────────────────── -->
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 // ════════════════════════════════════════════════════════════════════════
-// ⚠️ FILL IN YOUR SUPABASE PROJECT CREDENTIALS HERE
-// Get them from: Supabase Dashboard → Settings → API
+// Credentials are loaded from config.js (window.KITCHENOPS_CONFIG).
+// To change them, edit config.js — not this file.
 // ════════════════════════════════════════════════════════════════════════
-const SUPABASE_URL = 'https://ybpvjnkmubowqukjtjgh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicHZqbmttdWJvd3F1a2p0amdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDM2MjMsImV4cCI6MjA5NDA3OTYyM30.ZMeBlokB5k6Eg4g-NwvlVGKsjX0w6lvXf0ErFT9fQq0';
-// ════════════════════════════════════════════════════════════════════════
+const CFG = window.KITCHENOPS_CONFIG || {};
+const SUPABASE_URL = CFG.SUPABASE_URL;
+const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY;
 
 // Set to true once you deploy to a real URL (Netlify etc.) — enables magic link
 const IS_HOSTED = true;
 
 // ─── CONFIG CHECK ────────────────────────────────────────────────────────
 (function checkConfig(){
-  if(!SUPABASE_URL || SUPABASE_URL.includes('PASTE_YOUR') ||
+  if(!window.KITCHENOPS_CONFIG ||
+     !SUPABASE_URL || SUPABASE_URL.includes('PASTE_YOUR') ||
      !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('PASTE_YOUR')){
     document.getElementById('boot').classList.add('hidden');
     document.getElementById('config-err').classList.remove('hidden');
-    throw new Error('Supabase config missing — edit the HTML file');
+    throw new Error('Supabase config missing — edit config.js');
   }
 })();
 
@@ -1389,6 +1408,11 @@ const $ = (id) => document.getElementById(id);
 const show = (id) => $(id).classList.remove('hidden');
 const hide = (id) => $(id).classList.add('hidden');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+
+// ─── Feature flags ───────────────────────────────────────────────────────
+// Controlled from config.js. Defaults to false (trial off) if unset.
+const TRIAL_ENABLED = (window.KITCHENOPS_CONFIG && window.KITCHENOPS_CONFIG.TRIAL_ENABLED === true);
+
 
 // ─── THEME SYSTEM ────────────────────────────────────────────────────────
 // Preference is one of: 'dark' | 'light' | 'auto'.
@@ -1665,15 +1689,17 @@ async function loadDashboard(){
       const untilStr = until ? new Date(until).toLocaleDateString('el-GR') : '—';
       $('i-sub').innerHTML = `<span class="val green">Ενεργή</span> (έως ${untilStr})`;
     } else if(daysLeft > 0){
-      $('i-sub').innerHTML = `<span class="val amber">Δοκιμή — ${daysLeft} ${daysLeft===1?'ημέρα':'ημέρες'}</span>`;
+      $('i-sub').innerHTML = TRIAL_ENABLED
+        ? `<span class="val amber">Δοκιμή — ${daysLeft} ${daysLeft===1?'ημέρα':'ημέρες'}</span>`
+        : `<span class="val green">Ενεργή</span>`;
     } else {
       $('i-sub').innerHTML = `<span style="color:var(--red);font-weight:700">Έληξε</span>`;
     }
 
-    // Trial banner (only if no active sub)
+    // Trial banner (only if no active sub AND feature flag on)
     const slot = $('trial-banner-slot');
     slot.innerHTML = '';
-    if(!hasActiveSub){
+    if(TRIAL_ENABLED && !hasActiveSub){
       if(daysLeft > 3){
         slot.innerHTML = `<div class="trial-banner">
           <span class="trial-icon">🎁</span>
@@ -2114,6 +2140,9 @@ const db = (() => {
           provider_name: prov ? prov.name : (p.provider_name || null),
           quantity: +p.quantity || 0,
           unit_price: +p.unit_price || 0,
+          unit: (p.unit && UNITS.includes(p.unit)) ? p.unit
+                : (existing && existing.unit) ? existing.unit
+                : DEFAULT_UNIT,
           description: p.description || null,
           created_at: existing ? existing.created_at : now,
           updated_at: now,
@@ -2403,6 +2432,7 @@ const db = (() => {
               id: p.id, name: p.name, sku: p.sku,
               category: p.category_name, provider: p.provider_name,
               provider_id: p.provider_id,
+              unit: p.unit || DEFAULT_UNIT,
             },
             usedQuantity: +qty,
             receivedQuantity: 0,
@@ -2739,7 +2769,9 @@ function renderProducts(){
   list.innerHTML = items.map(p => {
     const cat = p.category_id ? db.categories.get(p.category_id) : null;
     const icon = cat ? cat.icon : '📦';
-    const low = (+p.quantity || 0) < 5;
+    const qty = +p.quantity || 0;
+    const low = qty < 5;
+    const unit = p.unit || DEFAULT_UNIT;
     return `<div class="lcard" data-pid="${esc(p.id)}">
       <span class="lcard-icon">${icon}</span>
       <div class="lcard-body">
@@ -2747,7 +2779,8 @@ function renderProducts(){
         <div class="lcard-meta">${esc(p.sku)} · ${esc(p.provider_name || 'χωρίς προμηθευτή')}</div>
       </div>
       <div class="lcard-right">
-        <span class="lcard-qty ${low?'low':''}">${+p.quantity || 0}</span>
+        <span class="lcard-qty ${low?'low':''}">${qty}</span>
+        <div class="lcard-unit">${esc(unitForQty(qty, unit))}</div>
         <div class="lcard-actions">
           <button class="lcard-btn" data-adj="${esc(p.id)}:-1">−</button>
           <button class="lcard-btn" data-adj="${esc(p.id)}:1">+</button>
@@ -2803,6 +2836,12 @@ function openProductModal(pid){
   $('prod-provider').innerHTML = '<option value="">— Κανένας —</option>' +
     provs.map(pr => `<option value="${esc(pr.id)}" ${p && p.provider_id===pr.id ? 'selected':''}>${esc(pr.name)}</option>`).join('');
 
+  // Build unit dropdown
+  const selectedUnit = (p && p.unit && UNITS.includes(p.unit)) ? p.unit : DEFAULT_UNIT;
+  $('prod-unit').innerHTML = UNITS.map(u =>
+    `<option value="${esc(u)}" ${u === selectedUnit ? 'selected' : ''}>${esc(u)}</option>`
+  ).join('');
+
   $('prod-modal-msg').innerHTML = '';
 
   // Add Delete button if editing
@@ -2848,6 +2887,7 @@ function saveProductFromModal(){
     provider_id: $('prod-provider').value || null,
     quantity: parseFloat($('prod-qty').value) || 0,
     unit_price: parseFloat($('prod-price').value) || 0,
+    unit: $('prod-unit').value || DEFAULT_UNIT,
     description: $('prod-desc').value.trim() || null,
   });
   $('prod-modal').classList.remove('show');
@@ -3206,18 +3246,17 @@ async function confirmImport(){
 // ════════════════════════════════════════════════════════════════════════
 
 // ─── Helpers ported from Phase 1 ─────────────────────────────────────────
-const CATEGORY_UNITS = {
-  'Κρέατα':'κιλά','Ψάρια & Θαλασσινά':'κιλά','Λαχανικά & Φρούτα':'κιλά',
-  'Γαλακτοκομικά':'τεμάχια','Ποτά':'τεμάχια','Καφές & Ροφήματα':'συσκευασίες',
-  'Αρτοσκευάσματα':'τεμάχια','Ζαχαροπλαστική':'τεμάχια','Άλλα':'τεμάχια',
+// ─── Per-product unit of measurement ────────────────────────────────────
+const UNITS = ['κιλά','γραμμάρια','λίτρα','ml','τεμάχια','συσκευασίες','κιβώτια','μερίδες'];
+const DEFAULT_UNIT = 'τεμάχια';
+const UNIT_SINGULAR = {
+  'κιλά':'κιλό','λίτρα':'λίτρο','τεμάχια':'τεμάχιο',
+  'συσκευασίες':'συσκευασία','κιβώτια':'κιβώτιο','μερίδες':'μερίδα',
 };
-function unitForQty(qty, baseUnit){
-  if(qty === 1){
-    if(baseUnit === 'κιλά') return 'κιλό';
-    if(baseUnit === 'τεμάχια') return 'τεμάχιο';
-    if(baseUnit === 'συσκευασίες') return 'συσκευασία';
-  }
-  return baseUnit;
+function unitForQty(qty, unit){
+  unit = unit || DEFAULT_UNIT;
+  if(qty === 1 && UNIT_SINGULAR[unit]) return UNIT_SINGULAR[unit];
+  return unit;
 }
 function greeting(){
   const h = new Date().getHours();
@@ -3226,7 +3265,7 @@ function greeting(){
 function buildOrderMessage(items){
   if(!items || !items.length) return '';
   const lines = items.map(i => {
-    const baseUnit = CATEGORY_UNITS[i.product.category] || 'τεμάχια';
+    const baseUnit = i.product.unit || DEFAULT_UNIT;
     const unit = unitForQty(i.usedQuantity, baseUnit);
     const sku = i.product.sku ? ` (${i.product.sku})` : '';
     return `• ${i.product.name} ${i.usedQuantity} ${unit}${sku}`;
@@ -3297,22 +3336,24 @@ function renderChecklist(){
   list.innerHTML = items.map(p => {
     const cat = p.category_id ? db.categories.get(p.category_id) : null;
     const icon = cat ? cat.icon : '📦';
-    const low = (+p.quantity || 0) < 5;
+    const stock = +p.quantity || 0;
+    const low = stock < 5;
     const isSel = checkSel[p.id] != null;
     const qty = checkSel[p.id] || 1;
+    const unit = p.unit || DEFAULT_UNIT;
     return `<div class="chk-row ${isSel?'on':''}" data-pid="${esc(p.id)}">
       <span class="chk-checkbox">${isSel?'✓':''}</span>
       <span class="chk-icon">${icon}</span>
       <div class="chk-body">
         <div class="chk-name">${esc(p.name)}</div>
-        <div class="chk-meta">${esc(p.sku)} · stock <b>${+p.quantity || 0}</b></div>
+        <div class="chk-meta">${esc(p.sku)} · stock <b>${stock} ${esc(unitForQty(stock, unit))}</b></div>
       </div>
       ${isSel ? `
       <div class="chk-qrow" data-qrow="${esc(p.id)}">
         <button data-chk-step="${esc(p.id)}:-1">−</button>
         <input type="number" value="${qty}" data-chk-input="${esc(p.id)}" inputmode="numeric"/>
         <button data-chk-step="${esc(p.id)}:1">+</button>
-      </div>` : `<span class="chk-stock ${low?'low':''}">${+p.quantity || 0}</span>`}
+      </div>` : `<span class="chk-stock ${low?'low':''}">${stock}</span>`}
     </div>`;
   }).join('');
 
@@ -3446,7 +3487,8 @@ function renderOrders(){
 
   list.innerHTML = items.map(o => {
     const itemCount = (o.items || []).length;
-    const totalQty = (o.items || []).reduce((s, i) => s + (+i.usedQuantity || 0), 0);
+    const provSet = new Set((o.items || []).map(i => i.product.provider || '—'));
+    const provCount = provSet.size;
     const statusLabel = ({new:'Νέα', pending:'Σε εξέλιξη', done:'Ολοκληρώθηκε', partial:'Μερική'})[o.status] || o.status;
     const parentHint = o.parent_order_id ? ' · Συμπληρωματική' : '';
     return `<div class="ord-card" data-oid="${esc(o.id)}">
@@ -3456,8 +3498,8 @@ function renderOrders(){
         <div class="ord-meta">${formatGreekDate(o.ordered_date)} · ${esc(o.ordered_time || '')}  ·  ${statusLabel}${parentHint}</div>
       </div>
       <div class="ord-stats">
-        <span class="pill">${itemCount} γρ.</span>
-        <span class="pill">${totalQty} τεμ.</span>
+        <span class="pill">${itemCount} ${itemCount === 1 ? 'είδος' : 'είδη'}</span>
+        <span class="pill">${provCount} προμηθ.</span>
       </div>
     </div>`;
   }).join('');
@@ -3473,7 +3515,7 @@ function openOrderDetail(oid){
   currentOpenOrderId = oid;
 
   $('odd-title').textContent = o.title || 'Παραγγελία';
-  $('odd-sub').textContent = `${formatGreekDate(o.ordered_date)} · ${o.ordered_time || ''} · ${(o.items || []).length} γραμμές`;
+  $('odd-sub').textContent = `${formatGreekDate(o.ordered_date)} · ${o.ordered_time || ''} · ${(o.items || []).length} ${(o.items || []).length === 1 ? 'είδος' : 'είδη'}`;
 
   // Status row — show partial pill only when active
   ['new','pending','done','partial'].forEach(s => {
@@ -3551,7 +3593,7 @@ function openOrderDetail(oid){
       }
       return `<div class="ord-prov-item">
         <span>${esc(i.product.name)} ${i.product.sku ? '<span style="color:var(--muted);font-size:10px">('+esc(i.product.sku)+')</span>' : ''}</span>
-        <span class="ord-prov-item-q">${qtyHtml} ${unitForQty(ordered, CATEGORY_UNITS[i.product.category] || 'τεμ')}</span>
+        <span class="ord-prov-item-q">${qtyHtml} ${unitForQty(ordered, i.product.unit || DEFAULT_UNIT)}</span>
       </div>`;
     }).join('');
     return `<div class="ord-prov-card">
@@ -3648,7 +3690,7 @@ function renderReceiveItems(order){
       return `<div class="recv-row ${stateClass}">
         <div>
           <div class="recv-row-name">${esc(it.product.name)}</div>
-          <div class="recv-row-sku">${esc(it.product.sku || '')} · παραγγέλθηκαν ${ordered}</div>
+          <div class="recv-row-sku">${esc(it.product.sku || '')} · παραγγέλθηκαν ${ordered} ${esc(unitForQty(ordered, it.product.unit || DEFAULT_UNIT))}</div>
         </div>
         <div class="recv-stepper">
           <button data-recv-step="${idx}:-1" ${received <= 0 ? 'disabled' : ''}>−</button>
@@ -3690,22 +3732,24 @@ function renderReceiveItems(order){
 }
 
 function updateReceiveSummary(order){
-  let totalShort = 0, totalOver = 0;
+  let shortItems = 0, overItems = 0;
   order.items.forEach((it, idx) => {
     const recv = _recvDraft[idx] != null ? _recvDraft[idx] : it.usedQuantity;
-    if(recv < it.usedQuantity) totalShort += (it.usedQuantity - recv);
-    else if(recv > it.usedQuantity) totalOver += (recv - it.usedQuantity);
+    if(recv < it.usedQuantity) shortItems++;
+    else if(recv > it.usedQuantity) overItems++;
   });
   const btn = $('recv-save-btn');
   if(!btn) return;
-  if(totalShort === 0 && totalOver === 0){
+  if(shortItems === 0 && overItems === 0){
     btn.textContent = 'Πλήρης Παραλαβή';
-  } else if(totalShort === 0 && totalOver > 0){
-    btn.textContent = `Παραλαβή (+${totalOver} πλεόνασμα)`;
-  } else if(totalShort > 0 && totalOver === 0){
-    btn.textContent = `Καταχώρηση (Νέα παραγγελία: ${totalShort} τεμ.)`;
+  } else if(shortItems === 0 && overItems > 0){
+    btn.textContent = overItems === 1 ? 'Παραλαβή (1 με πλεόνασμα)' : `Παραλαβή (${overItems} με πλεόνασμα)`;
+  } else if(shortItems > 0 && overItems === 0){
+    btn.textContent = shortItems === 1
+      ? 'Καταχώρηση (Νέα παραγγελία για 1 είδος)'
+      : `Καταχώρηση (Νέα παραγγελία για ${shortItems} είδη)`;
   } else {
-    btn.textContent = `Καταχώρηση (−${totalShort} / +${totalOver})`;
+    btn.textContent = `Καταχώρηση (${shortItems} ελλιπή / ${overItems} με πλεόνασμα)`;
   }
 }
 
@@ -3714,33 +3758,37 @@ function confirmReceive(){
   const o = db.orders.get(currentOpenOrderId);
   if(!o) return;
 
-  // Compute totals from draft
-  let totalReceived = 0, totalShort = 0, totalOver = 0;
+  // Count items by status — don't sum across units
+  let shortItems = 0, overItems = 0, exactItems = 0;
   o.items.forEach((it, idx) => {
     const recv = _recvDraft[idx] != null ? _recvDraft[idx] : it.usedQuantity;
-    totalReceived += recv;
-    if(recv < it.usedQuantity) totalShort += (it.usedQuantity - recv);
-    else if(recv > it.usedQuantity) totalOver += (recv - it.usedQuantity);
+    if(recv < it.usedQuantity) shortItems++;
+    else if(recv > it.usedQuantity) overItems++;
+    else exactItems++;
   });
-
-  const isFullOrOver = totalShort === 0;
+  const total = o.items.length;
 
   let title, message, yesLabel;
-  if(isFullOrOver && totalOver === 0){
+  if(shortItems === 0 && overItems === 0){
     title = 'Πλήρης Παραλαβή';
-    message = `Επιβεβαιώνεις παραλαβή όλων των προϊόντων (${totalReceived} τεμ.); Το στοκ θα ενημερωθεί.`;
+    message = total === 1
+      ? 'Επιβεβαιώνεις την πλήρη παραλαβή του είδους; Το στοκ θα ενημερωθεί.'
+      : `Επιβεβαιώνεις την πλήρη παραλαβή και των ${total} ειδών; Το στοκ θα ενημερωθεί.`;
     yesLabel = 'Επιβεβαίωση';
-  } else if(isFullOrOver && totalOver > 0){
+  } else if(shortItems === 0 && overItems > 0){
     title = 'Παραλαβή με Πλεόνασμα';
-    message = `Παραλαβή ${totalReceived} τεμ. (${totalOver} πέραν της παραγγελίας). Το στοκ θα ενημερωθεί.`;
+    message = `Παραλαβή ${total} ${total === 1 ? 'είδους' : 'ειδών'} · ${overItems} με πλεόνασμα. Το στοκ θα ενημερωθεί.`;
     yesLabel = 'Επιβεβαίωση';
-  } else if(totalReceived === 0){
+  } else if(exactItems === 0 && overItems === 0){
     title = 'Μερική Παραλαβή';
-    message = `Δεν παραλήφθηκε κανένα τεμάχιο (λείπουν ${totalShort}). Θα δημιουργηθεί νέα παραγγελία για όλα τα ελλείποντα.`;
+    message = 'Δεν παραλήφθηκε κανένα είδος. Θα δημιουργηθεί νέα παραγγελία για όλα τα ελλείποντα.';
     yesLabel = 'Καταχώρηση';
   } else {
     title = 'Μερική Παραλαβή';
-    message = `Παραλαβή: ${totalReceived} τεμ. · Λείπουν: ${totalShort} τεμ.${totalOver ? ' · Πλεόνασμα: ' + totalOver : ''}. Το στοκ θα ενημερωθεί και θα δημιουργηθεί νέα παραγγελία για τα υπόλοιπα.`;
+    const parts = [`${shortItems} ${shortItems === 1 ? 'ελλιπές' : 'ελλιπή'}`];
+    if(overItems) parts.push(`${overItems} με πλεόνασμα`);
+    if(exactItems) parts.push(`${exactItems} ${exactItems === 1 ? 'πλήρες' : 'πλήρη'}`);
+    message = `Παραλαβή ${total} ${total === 1 ? 'είδους' : 'ειδών'} · ${parts.join(' · ')}. Θα δημιουργηθεί νέα παραγγελία για τα ελλείποντα.`;
     yesLabel = 'Καταχώρηση';
   }
 
@@ -3749,12 +3797,12 @@ function confirmReceive(){
     $('recv-modal').classList.remove('show');
     renderProducts(); renderOrders(); populateCatChips();
     if(result && result.followUp){
-      // Open the follow-up order so user immediately sees the new one
       openOrderDetail(result.followUp.id);
-      toast(`Νέα παραγγελία για ${result.totals.short} ελλείποντα`, 'ok');
+      const fuCount = result.followUp.items.length;
+      toast(`Νέα παραγγελία για ${fuCount} ${fuCount === 1 ? 'ελλιπές είδος' : 'ελλιπή είδη'}`, 'ok');
     } else {
       openOrderDetail(currentOpenOrderId);
-      toast(totalOver > 0 ? `✓ Παραλαβή (+${totalOver} πλεόνασμα)` : '✓ Παραγγελία ολοκληρώθηκε', 'ok');
+      toast(overItems > 0 ? '✓ Παραλαβή με πλεόνασμα' : '✓ Παραγγελία ολοκληρώθηκε', 'ok');
     }
   }, yesLabel);
 }
@@ -4762,7 +4810,11 @@ function renderSettingsPage(){
   // Trial / subscription line
   if(restName && restName.trial_ends_at){
     const daysLeft = Math.ceil((new Date(restName.trial_ends_at) - new Date()) / 86400000);
-    $('set-sub').textContent = daysLeft > 0 ? `Δοκιμή — ${daysLeft} ημέρες` : 'Δοκιμή έληξε';
+    if(!TRIAL_ENABLED){
+      $('set-sub').textContent = 'Ενεργό';
+    } else {
+      $('set-sub').textContent = daysLeft > 0 ? `Δοκιμή — ${daysLeft} ημέρες` : 'Δοκιμή έληξε';
+    }
   } else {
     $('set-sub').textContent = '—';
   }
@@ -4881,6 +4933,23 @@ document.addEventListener('keydown', (e) => {
     else $('btn-signup').click();
   }
 });
+
+// ─── Service Worker registration ────────────────────────────────────────
+// Enables PWA installability + offline app shell. The service worker file
+// MUST be at the same path scope as the app for it to control the page.
+// On GitHub Pages this is /Kitchenops/sw.js relative to the deploy root.
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then((reg) => {
+        // Quietly check for updates every 60 minutes while the app is open
+        setInterval(() => { reg.update().catch(() => {}); }, 60 * 60 * 1000);
+        // If a new version is waiting, tell it to take over on next navigation
+        if(reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+      })
+      .catch((err) => console.warn('SW registration failed (non-fatal):', err));
+  });
+}
 </script>
 </body>
 </html>

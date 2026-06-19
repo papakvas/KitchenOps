@@ -1,0 +1,34 @@
+{
+  "name": "KitchenOPS",
+  "short_name": "KitchenOPS",
+  "description": "Cloud εργαλείο διαχείρισης κουζίνας — αποθήκη, παραγγελίες, πρόγραμμα βαρδιών για εστιατόρια.",
+  "lang": "el",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "food"],
+  "start_url": "/Kitchenops/KitchenOPS-cloud.html",
+  "scope": "/Kitchenops/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#161310",
+  "theme_color": "#e8a045",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
